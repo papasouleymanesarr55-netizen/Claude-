@@ -250,6 +250,7 @@ export const demoSource: DataSource & { datasetId: string } = {
     label: 'Paris 10e',
     position: { lat: 48.8675, lng: 2.3637 },
     isDemo: true,
+    source: 'demo',
   },
   listPlaces: () => Promise.resolve(places),
   listVehicles: () => Promise.resolve(vehicles),

@@ -1,11 +1,19 @@
-import { AlertTriangle, DatabaseZap, MapPin, SearchX } from 'lucide-react';
+import { AlertTriangle, DatabaseZap, MapPin, MapPinned, SearchX } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/Card';
 import { DemoBadge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useData } from '@/features/data/DataProvider';
+import {
+  GeolocationNotice,
+  LocateButton,
+  ProviderFailureNotice,
+  RadiusSelect,
+  SearchAreaButton,
+} from '@/features/location/LocationControls';
 import { LazyMapView } from '@/features/map/LazyMapView';
+import { distanceMeters, type LatLng } from '@/lib/geo';
 import { cn } from '@/lib/cn';
 import { MQ_TABLET_UP, useMediaQuery } from '@/lib/useMediaQuery';
 import { BottomSheet } from './BottomSheet';
@@ -47,7 +55,7 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
       ),
     [scoped, activeCategories, filters.query, t],
   );
-  const availableCategories = scope.filter((c) => scoped.some((p) => p.category === c));
+  const availableCategories = scope.filter((c) => data.categories.includes(c));
 
   const select = useCallback((id: string) => setSelectedId(id), [setSelectedId]);
 
@@ -60,7 +68,41 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
     el?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }, [selectedId]);
 
-  const center = data.location?.position ?? null;
+  const { area, location } = data;
+  const focus = useMemo(
+    () => (area ? { center: area.center, radiusM: area.radiusM } : null),
+    [area],
+  );
+  const userPosition = location?.source === 'device' ? location.position : null;
+
+  // Proposer « Rechercher dans cette zone » quand l'utilisateur a déplacé la carte.
+  const [movedCenter, setMovedCenter] = useState<LatLng | null>(null);
+  const showSearchArea =
+    movedCenter != null &&
+    area != null &&
+    distanceMeters(movedCenter, area.center) > area.radiusM * 0.25;
+  const searchHere = () => {
+    if (movedCenter) data.searchArea(movedCenter);
+    setMovedCenter(null);
+  };
+
+  const sublabel = !location
+    ? null
+    : location.isDemo
+      ? t('demo.location')
+      : location.source === 'device' && location.accuracyM != null && location.accuracyM > 0
+        ? t('location.accuracy', { meters: location.accuracyM })
+        : (location.context ?? null);
+
+  const mapProps = {
+    places: visible,
+    selectedId,
+    focus,
+    userPosition,
+    onLocate: data.requestGeolocation,
+    locatePending: data.geolocation.status === 'pending',
+    onUserMove: setMovedCenter,
+  };
 
   const locationHeader = (
     <div className="flex min-w-0 items-center gap-2.5">
@@ -72,9 +114,12 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
       />
       <div className="min-w-0">
         <p className="truncate text-[19px] font-medium tracking-tight md:text-[22px]">
-          {data.location?.label ?? t('places.positionUnknown')}
+          {location?.label ??
+            (location?.source === 'device'
+              ? t('location.yourPosition')
+              : t('places.positionUnknown'))}
         </p>
-        {data.location?.isDemo && <p className="text-[12px] text-muted">{t('demo.location')}</p>}
+        {sublabel && <p className="truncate text-[12px] text-muted">{sublabel}</p>}
       </div>
     </div>
   );
@@ -86,6 +131,15 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
   );
 
   const resultBody = (layout: 'row' | 'column') => {
+    if (data.status === 'needs-location')
+      return (
+        <EmptyState
+          icon={MapPinned}
+          title={t('location.chooseTitle')}
+          text={t('location.chooseText')}
+          action={<LocateButton />}
+        />
+      );
     if (data.status === 'loading')
       return <p className="px-1 py-6 text-sm text-muted">{t('places.loading')}</p>;
     if (data.status === 'unavailable')
@@ -152,16 +206,19 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
       <div>
         <div className="fixed inset-x-0 top-[calc(56px+var(--banner-offset))] bottom-[calc(64px+128px+env(safe-area-inset-bottom))]">
           <LazyMapView
-            places={visible}
-            selectedId={selectedId}
+            {...mapProps}
             onSelect={(id) => {
               select(id);
               setSheetExpanded(false);
             }}
-            center={center}
             className="h-full w-full"
             controlsClassName="top-[68px]"
           />
+          {showSearchArea && (
+            <div className="absolute inset-x-0 top-[64px] z-10 flex justify-center">
+              <SearchAreaButton onClick={searchHere} />
+            </div>
+          )}
           <div className="absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-bg/85 to-transparent px-4 pt-3 pb-6">
             <CategoryFilters
               available={availableCategories}
@@ -183,7 +240,15 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
             </div>
           }
         >
-          <div className="mb-3">{countLabel}</div>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            {countLabel}
+            <div className="flex flex-wrap items-center gap-2">
+              <LocateButton />
+              <RadiusSelect />
+            </div>
+          </div>
+          <GeolocationNotice className="mb-3" />
+          <ProviderFailureNotice className="mb-3" />
           {resultBody('column')}
         </BottomSheet>
       </div>
@@ -195,24 +260,33 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
       <Card className="p-5 xl:p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           {locationHeader}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {countLabel}
+            <LocateButton />
+            <RadiusSelect />
             {headerAction}
           </div>
         </div>
+        <GeolocationNotice className="mb-4" />
+        <ProviderFailureNotice className="mb-4" />
         <CategoryFilters
           className="mb-4"
           available={availableCategories}
           selected={activeCategories}
           onChange={filters.setCategories}
         />
-        <LazyMapView
-          places={visible}
-          selectedId={selectedId}
-          onSelect={select}
-          center={center}
-          className="h-[420px] rounded-[12px] xl:h-[clamp(340px,46vh,520px)]"
-        />
+        <div className="relative">
+          <LazyMapView
+            {...mapProps}
+            onSelect={select}
+            className="h-[420px] rounded-[12px] xl:h-[clamp(340px,46vh,520px)]"
+          />
+          {showSearchArea && (
+            <div className="absolute inset-x-0 top-3 z-10 flex justify-center">
+              <SearchAreaButton onClick={searchHere} />
+            </div>
+          )}
+        </div>
       </Card>
       <section aria-labelledby="nearby-title">
         <h2 id="nearby-title" className="sr-only">

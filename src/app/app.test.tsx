@@ -1,21 +1,19 @@
 import { fireEvent, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { demoSource } from '@/features/demo/demoSource';
-import { renderApp } from '@/test/render';
+import { emptySetup, renderApp } from '@/test/render';
 
-const loadDemo = () => Promise.resolve(demoSource);
-const loadNone = () => Promise.resolve(null);
+const loadNone = () => Promise.resolve(emptySetup);
 
 describe('Application', () => {
   it('affiche le bandeau de démonstration et les établissements de démo', async () => {
-    renderApp('/', loadDemo);
+    renderApp('/');
     expect(await screen.findByText(/Données de démonstration/)).toBeInTheDocument();
     expect(await screen.findByText('15 établissements')).toBeInTheDocument();
     expect(screen.getAllByRole('article')).toHaveLength(15);
   });
 
   it('filtre par catégorie via les pastilles et l’URL', async () => {
-    const { router } = renderApp('/', loadDemo);
+    const { router } = renderApp('/');
     await screen.findByText('15 établissements');
     const filters = screen.getByRole('group', { name: 'Filtrer par catégorie' });
     fireEvent.click(within(filters).getByRole('button', { name: 'Parking' }));
@@ -24,20 +22,20 @@ describe('Application', () => {
   });
 
   it('restreint la page Bornes de recharge à sa catégorie', async () => {
-    renderApp('/recharge', loadDemo);
+    renderApp('/recharge');
     expect(await screen.findByText('4 établissements')).toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Filtrer par catégorie' })).not.toBeInTheDocument();
   });
 
   it('recherche un établissement depuis la barre supérieure', async () => {
-    renderApp('/', loadDemo);
+    renderApp('/');
     await screen.findByText('15 établissements');
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'bastille' } });
     expect(await screen.findByText('1 établissement')).toBeInTheDocument();
   });
 
   it('indique la page active dans la navigation', async () => {
-    renderApp('/parkings', loadDemo);
+    renderApp('/parkings');
     const nav = await screen.findByRole('navigation', { name: 'Navigation' });
     expect(within(nav).getByRole('link', { name: 'Parkings' })).toHaveAttribute(
       'aria-current',

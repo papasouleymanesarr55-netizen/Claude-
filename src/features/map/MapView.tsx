@@ -10,13 +10,22 @@ import type { PlaceWithDistance } from '@/features/places/types';
 import { cn } from '@/lib/cn';
 import type { LatLng } from '@/lib/geo';
 import { MapPin } from './MapPin';
+import { zoomForRadius } from '@/features/location/area';
 import { applyBrandPalette, MAP_STYLE_URL } from './mapStyle';
 
 export interface MapViewProps {
   places: PlaceWithDistance[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  center: LatLng | null;
+  /** Zone à afficher : la carte s'y recentre à chaque changement. */
+  focus: { center: LatLng; radiusM: number } | null;
+  /** Position de l'utilisateur (marqueur « vous êtes ici »), si partagée. */
+  userPosition?: LatLng | null;
+  /** Bouton « Ma position » : demande ou recentre sur la position de l'utilisateur. */
+  onLocate?: () => void;
+  locatePending?: boolean;
+  /** Centre de la carte après un déplacement fait par l'utilisateur. */
+  onUserMove?: (center: LatLng) => void;
   className?: string;
   /** Position des boutons de zoom (ex. sous les filtres sur mobile). */
   controlsClassName?: string;
@@ -36,7 +45,11 @@ export default function MapView({
   places,
   selectedId,
   onSelect,
-  center,
+  focus,
+  userPosition = null,
+  onLocate,
+  locatePending = false,
+  onUserMove,
   className,
   controlsClassName = 'top-3',
 }: MapViewProps) {
@@ -46,15 +59,17 @@ export default function MapView({
   const [markers, setMarkers] = useState<globalThis.Map<string, MarkerEntry>>(new globalThis.Map());
   const [failed, setFailed] = useState(false);
   const onSelectRef = useRef(onSelect);
+  const onUserMoveRef = useRef(onUserMove);
   useEffect(() => {
     onSelectRef.current = onSelect;
+    onUserMoveRef.current = onUserMove;
   });
 
   // Création de la carte (une seule fois).
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const start = center ?? FRANCE_CENTER;
+    const start = focus?.center ?? FRANCE_CENTER;
     let map: MlMap;
     try {
       map = new MlMap({
@@ -63,7 +78,7 @@ export default function MapView({
         transformStyle: (_prev: StyleSpecification | undefined, next: StyleSpecification) =>
           applyBrandPalette(next),
         center: [start.lng, start.lat],
-        zoom: center ? 13.6 : 5,
+        zoom: focus ? zoomForRadius(focus.radiusM) : 5,
         attributionControl: { compact: true },
         dragRotate: false,
         pitchWithRotate: false,
@@ -84,6 +99,12 @@ export default function MapView({
       // seul l'échec du style (avant le premier chargement) déclenche l'état de repli.
       const isSourceError = 'sourceId' in e || 'tile' in e;
       if (!loaded && !isSourceError) setFailed(true);
+    });
+    map.on('moveend', (e) => {
+      // Seuls les déplacements faits par l'utilisateur (glisser, zoom) sont signalés.
+      if (!('originalEvent' in e) || !e.originalEvent) return;
+      const c = map.getCenter();
+      onUserMoveRef.current?.({ lat: c.lat, lng: c.lng });
     });
     mapRef.current = map;
     return () => {
@@ -116,6 +137,35 @@ export default function MapView({
     return () => next.forEach(({ marker }) => marker.remove());
   }, [places]);
 
+  // Recentrage quand la zone de recherche change (position, adresse, rayon).
+  const focusKey = focus ? `${focus.center.lat},${focus.center.lng},${focus.radiusM}` : null;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !focus) return;
+    map.easeTo({
+      center: [focus.center.lng, focus.center.lat],
+      zoom: zoomForRadius(focus.radiusM),
+      duration: 700,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusKey]);
+
+  // Marqueur « vous êtes ici ».
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !userPosition) return;
+    const el = document.createElement('div');
+    el.className = 'user-dot';
+    el.setAttribute('role', 'img');
+    el.setAttribute('aria-label', t('map.youAreHere'));
+    const marker = new Marker({ element: el, anchor: 'center' })
+      .setLngLat([userPosition.lng, userPosition.lat])
+      .addTo(map);
+    return () => {
+      marker.remove();
+    };
+  }, [userPosition, t]);
+
   // Mise au premier plan et centrage du marqueur sélectionné.
   useEffect(() => {
     const map = mapRef.current;
@@ -131,11 +181,6 @@ export default function MapView({
       duration: 600,
     });
   }, [selectedId, markers, places]);
-
-  const recenter = () => {
-    if (!center) return;
-    mapRef.current?.easeTo({ center: [center.lng, center.lat], zoom: 13.6, duration: 600 });
-  };
 
   return (
     <div className={cn('relative overflow-hidden bg-[#1a201d]', className)}>
@@ -169,14 +214,18 @@ export default function MapView({
               <Minus className="size-4" />
             </IconButton>
           </div>
-          {center && (
+          {onLocate && (
             <IconButton
-              label={t('map.recenter')}
+              label={t('map.locate')}
               size="sm"
-              className="border border-white/5 bg-card/90 backdrop-blur"
-              onClick={recenter}
+              aria-busy={locatePending}
+              className={cn(
+                'border border-white/5 bg-card/90 backdrop-blur',
+                userPosition && 'text-accent hover:text-accent',
+              )}
+              onClick={onLocate}
             >
-              <LocateFixed className="size-4" />
+              <LocateFixed className={cn('size-4', locatePending && 'animate-pulse')} />
             </IconButton>
           )}
         </div>

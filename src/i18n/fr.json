@@ -62,7 +62,8 @@
     "errorTitle": "Chargement impossible",
     "errorText": "Les données n’ont pas pu être chargées. Réessayez dans un instant.",
     "positionUnknown": "Position non définie",
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "partialFailure": "Source momentanément indisponible : {{sources}}. Ses établissements ne sont pas affichés."
   },
   "map": {
     "label": "Carte des services automobiles",
@@ -70,7 +71,9 @@
     "zoomOut": "Zoom arrière",
     "recenter": "Recentrer",
     "unavailable": "Carte indisponible",
-    "unavailableText": "La carte n’a pas pu se charger. La liste reste disponible."
+    "unavailableText": "La carte n’a pas pu se charger. La liste reste disponible.",
+    "locate": "Ma position",
+    "youAreHere": "Vous êtes ici"
   },
   "vehicle": {
     "title": "Mon véhicule",
@@ -132,5 +135,40 @@
   },
   "notFound": {
     "text": "Cette page n’existe pas ou a été déplacée."
+  },
+  "location": {
+    "useMine": "Utiliser ma position",
+    "update": "Actualiser ma position",
+    "locating": "Localisation…",
+    "yourPosition": "Votre position",
+    "accuracy": "Précision ± {{meters}} m",
+    "radius": "Rayon de recherche",
+    "searchArea": "Rechercher dans cette zone",
+    "retry": "Réessayer",
+    "chooseTitle": "Où cherchez-vous ?",
+    "chooseText": "Partagez votre position pour trouver les services autour de vous. Elle n’est ni enregistrée ni transmise à nos serveurs.",
+    "distanceHint": "Distances à vol d’oiseau",
+    "errors": {
+      "denied": {
+        "title": "Géolocalisation refusée",
+        "text": "Autorisez l’accès à la position dans les réglages de votre navigateur, ou recherchez une adresse."
+      },
+      "unavailable": {
+        "title": "Position introuvable",
+        "text": "Votre appareil n’a pas pu déterminer votre position. Réessayez ou recherchez une adresse."
+      },
+      "timeout": {
+        "title": "Délai dépassé",
+        "text": "La localisation a pris trop de temps. Réessayez ou recherchez une adresse."
+      },
+      "unsupported": {
+        "title": "Géolocalisation non prise en charge",
+        "text": "Votre navigateur ne permet pas la géolocalisation. Recherchez une adresse."
+      },
+      "insecure": {
+        "title": "Connexion non sécurisée",
+        "text": "La géolocalisation n’est disponible que sur une connexion sécurisée (HTTPS)."
+      }
+    }
   }
 }

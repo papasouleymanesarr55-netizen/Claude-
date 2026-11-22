@@ -1,0 +1,46 @@
+import type { CategoryId } from '@/features/places/types';
+import type { ReferenceLocation } from '@/features/data/types';
+import type { Vehicle } from '@/features/vehicles/types';
+import type { PlacesProvider } from './types';
+
+export interface ProviderSetup {
+  places: PlacesProvider[];
+  /** Catégories couvertes par au moins un fournisseur (les autres sont masquées). */
+  categories: CategoryId[];
+  /** Position de départ quand l'utilisateur n'a pas encore choisi (démo uniquement). */
+  defaultLocation: ReferenceLocation | null;
+  vehicles: Vehicle[];
+}
+
+/**
+ * Point unique de configuration des fournisseurs.
+ * Les sources réelles (carburants, bornes) seront ajoutées ici, catégorie par catégorie.
+ * `__DEMO_DATA__` est une constante de compilation : en production, le module de démonstration
+ * est éliminé du bundle (voir build/demo-guard.ts).
+ */
+export async function loadProviders(): Promise<ProviderSetup> {
+  const places: PlacesProvider[] = [];
+  let defaultLocation: ReferenceLocation | null = null;
+  let vehicles: Vehicle[] = [];
+
+  if (__DEMO_DATA__) {
+    const [{ createDemoPlacesProvider }, { demoSource }] = await Promise.all([
+      import('@/adapters/places/demo'),
+      import('@/features/demo/demoSource'),
+    ]);
+    const covered = new Set(places.flatMap((p) => p.categories));
+    const demoCategories = (
+      ['charging', 'fuel', 'parking', 'garage', 'wash', 'tyres'] as CategoryId[]
+    ).filter((c) => !covered.has(c));
+    if (demoCategories.length > 0) places.push(createDemoPlacesProvider(demoCategories));
+    defaultLocation = demoSource.location;
+    vehicles = await demoSource.listVehicles();
+  }
+
+  return {
+    places,
+    categories: [...new Set(places.flatMap((p) => p.categories))],
+    defaultLocation,
+    vehicles,
+  };
+}

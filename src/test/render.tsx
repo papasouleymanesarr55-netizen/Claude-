@@ -1,19 +1,33 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { DataProvider } from '@/features/data/DataProvider';
-import type { DataSource } from '@/features/data/types';
 import { routes } from '@/app/routes';
+import { loadProviders, type ProviderSetup } from '@/core/providers/registry';
+import { DataProvider } from '@/features/data/DataProvider';
 
-/** Rend l'application complète sur une URL donnée, avec une source de données injectée. */
-export function renderApp(url: string, load: () => Promise<DataSource | null>) {
+export const emptySetup: ProviderSetup = {
+  places: [],
+  categories: [],
+  defaultLocation: null,
+  vehicles: [],
+};
+
+function testQueryClient() {
+  return new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } });
+}
+
+/** Rend l'application complète sur une URL donnée, avec des fournisseurs injectés. */
+export function renderApp(url: string, load: () => Promise<ProviderSetup> = loadProviders) {
   const router = createMemoryRouter(routes, { initialEntries: [url] });
   return {
     router,
     ...render(
-      <DataProvider load={load}>
-        <RouterProvider router={router} />
-      </DataProvider>,
+      <QueryClientProvider client={testQueryClient()}>
+        <DataProvider load={load}>
+          <RouterProvider router={router} />
+        </DataProvider>
+      </QueryClientProvider>,
     ),
   };
 }
