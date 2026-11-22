@@ -4,6 +4,8 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --banner-h: 34px;
+    --banner-offset: 0px;
   }
   html,
   body,
@@ -12,10 +14,53 @@
   }
   body {
     @apply bg-bg text-text font-sans antialiased;
+    font-feature-settings: 'ss01';
+    -webkit-tap-highlight-color: transparent;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent;
   }
+  input[type='search']::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Marqueurs de carte : bouton sans style natif. */
+.map-pin {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Attribution OpenFreeMap / OpenMapTiles / OpenStreetMap : toujours visible, intégrée au thème. */
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  background: rgb(21 24 22 / 0.85) !important;
+  color: var(--color-muted);
+  margin: 0 8px 8px 0 !important;
+  font-size: 11px;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact-show {
+  padding: 3px 28px 3px 8px !important;
+}
+.maplibregl-ctrl-attrib-inner {
+  color: var(--color-muted);
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--color-muted) !important;
+}
+.maplibregl-ctrl-attrib a:hover {
+  color: var(--color-text) !important;
+}
+.maplibregl-ctrl-attrib-button {
+  filter: invert(0.85);
 }
 
 @media (prefers-reduced-motion: reduce) {

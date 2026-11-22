@@ -21,7 +21,15 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
-      - run: npm run build
+      - name: Build de production (sans données de démonstration)
+        run: npm run build
+      - name: Aucune donnée de démonstration dans le build de production
+        run: '! grep -rl "__DEMO_DATASET__" dist'
+      - name: Le build de production refuse VITE_DEMO_DATA=true
+        run: |
+          if VITE_DEMO_DATA=true npx vite build --outDir /tmp/should-fail; then
+            echo "Le garde-fou n'a pas bloqué le build" && exit 1
+          fi
 
   e2e:
     runs-on: ubuntu-latest
