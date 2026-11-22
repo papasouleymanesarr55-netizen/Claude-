@@ -24,7 +24,13 @@ npm run dev
 ## Structure
 
 ```
-src/app/        application et providers
+src/app/        application, routes
+src/layouts/    sidebar, barre supérieure, navigation mobile, panneau droit
+src/components/ primitives d'interface (Card, Chip, Drawer…)
+src/features/   carte, établissements, véhicules, favoris, données, démo
+src/pages/      pages de l'application
+src/lib/        utilitaires (distance, formats, liens d'itinéraire)
+build/          garde-fou des données de démonstration
 src/config/     marque (brand.ts) et variables d'environnement
 src/styles/     design tokens et styles globaux
 src/i18n/       traductions
@@ -33,3 +39,9 @@ docs/           décisions d'architecture (ADR) et sources de données
 ```
 
 Le nom du produit est défini uniquement dans `src/config/brand.ts`.
+
+## Données de démonstration
+
+En développement (`npm run dev`), l'application affiche des **données fictives**, signalées par un
+bandeau et un badge « Démo ». Le build de production les refuse. Voir `docs/data-sources.md` pour
+les sources, les licences et le fonctionnement du garde-fou.

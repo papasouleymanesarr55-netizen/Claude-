@@ -1,7 +1,136 @@
 {
-  "app": {
-    "status": "Socle technique en place",
-    "statusDetail": "Les écrans du produit arrivent à l'étape suivante.",
-    "provisionalName": "Nom provisoire"
+  "nav": {
+    "main": "Navigation",
+    "personal": "Espace personnel",
+    "dashboard": "Dashboard",
+    "explorer": "Explorer",
+    "charging": "Bornes de recharge",
+    "parking": "Parkings",
+    "services": "Services auto",
+    "favorites": "Mes favoris",
+    "vehicles": "Mes véhicules",
+    "account": "Mon compte",
+    "subscription": "Abonnement",
+    "pages": "Pages",
+    "home": "Accueil",
+    "chargingShort": "Recharge",
+    "favoritesShort": "Favoris",
+    "accountShort": "Compte",
+    "mobile": "Navigation principale"
+  },
+  "categories": {
+    "charging": "Recharge",
+    "fuel": "Carburant",
+    "parking": "Parking",
+    "garage": "Garage",
+    "wash": "Lavage",
+    "tyres": "Pneus",
+    "all": "Tout"
+  },
+  "demo": {
+    "badge": "Démo",
+    "banner": "Données de démonstration : les établissements, prix et véhicules affichés sont fictifs.",
+    "priceLabel": "Prix démo",
+    "location": "Position de démonstration",
+    "directionsDisabled": "Itinéraire disponible avec les données réelles"
+  },
+  "topbar": {
+    "search": "Rechercher un service, une adresse…",
+    "searchLabel": "Rechercher",
+    "guest": "Invité",
+    "guestInitials": "IN",
+    "openVehicle": "Mon véhicule",
+    "closeSearch": "Fermer la recherche"
+  },
+  "places": {
+    "nearby": "À proximité",
+    "count_one": "{{count}} établissement",
+    "count_other": "{{count}} établissements",
+    "price": "Prix",
+    "notProvided": "Non communiqué",
+    "directions": "Itinéraire",
+    "directionsTo": "Itinéraire vers {{name}}",
+    "addFavorite": "Ajouter aux favoris",
+    "removeFavorite": "Retirer des favoris",
+    "filters": "Filtrer par catégorie",
+    "noResults": "Aucun établissement ne correspond à votre recherche.",
+    "resetFilters": "Réinitialiser les filtres",
+    "showList": "Afficher la liste",
+    "hideList": "Réduire la liste",
+    "unavailableTitle": "Aucune source de données connectée",
+    "unavailableText": "Les données réelles (bornes IRVE, carburants, parkings, OpenStreetMap) seront branchées à une prochaine étape.",
+    "errorTitle": "Chargement impossible",
+    "errorText": "Les données n’ont pas pu être chargées. Réessayez dans un instant.",
+    "positionUnknown": "Position non définie",
+    "loading": "Chargement…"
+  },
+  "map": {
+    "label": "Carte des services automobiles",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière",
+    "recenter": "Recentrer",
+    "unavailable": "Carte indisponible",
+    "unavailableText": "La carte n’a pas pu se charger. La liste reste disponible."
+  },
+  "vehicle": {
+    "title": "Mon véhicule",
+    "manage": "Gérer mes véhicules",
+    "energy": "Énergie",
+    "range": "Autonomie",
+    "connector": "Prise",
+    "maxCharge": "Recharge max",
+    "rangeHint": "Valeurs constructeur déclarées",
+    "none": "Aucun véhicule enregistré",
+    "noneText": "L’ajout de véhicules arrive avec les comptes utilisateurs.",
+    "energies": {
+      "electric": "Électrique",
+      "hybrid": "Hybride",
+      "petrol": "Essence",
+      "diesel": "Diesel"
+    }
+  },
+  "panel": {
+    "shortcuts": "Raccourcis",
+    "shortcutCharging": "Bornes",
+    "shortcutFuel": "Stations-service",
+    "shortcutParking": "Parkings",
+    "shortcutGarage": "Garages",
+    "nearestCharger": "Borne la plus proche",
+    "showOnMap": "Voir sur la carte",
+    "nearbyServices": "Services à proximité",
+    "withinRadius": "Dans un rayon de {{km}} km",
+    "recentFavorites": "Favoris récents",
+    "noFavorites": "Aucun favori pour l’instant",
+    "noFavoritesText": "Ajoutez un établissement avec le cœur pour le retrouver ici.",
+    "close": "Fermer",
+    "drawerTitle": "Véhicule et raccourcis"
+  },
+  "premium": {
+    "title": "Offre Premium",
+    "text": "Alertes, itinéraires optimisés et plus encore.",
+    "soon": "Bientôt disponible",
+    "cta": "En savoir plus"
+  },
+  "pages": {
+    "dashboard": "Dashboard",
+    "explorer": "Explorer",
+    "charging": "Bornes de recharge",
+    "parking": "Parkings",
+    "services": "Services automobiles",
+    "favorites": "Mes favoris",
+    "vehicles": "Mes véhicules",
+    "account": "Mon compte",
+    "subscription": "Abonnement",
+    "notFound": "Page introuvable"
+  },
+  "comingSoon": {
+    "title": "Bientôt disponible",
+    "account": "La création de compte et la connexion arriveront avec le back-end sécurisé.",
+    "subscription": "Les offres et le paiement en ligne seront proposés dans une prochaine version.",
+    "vehicles": "L’ajout et la gestion de vos véhicules arriveront avec les comptes utilisateurs.",
+    "back": "Retour au dashboard"
+  },
+  "notFound": {
+    "text": "Cette page n’existe pas ou a été déplacée."
   }
 }
