@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.33115, 48.868989]
+      },
+      "properties": {
+        "label": "10 Rue de la Paix 75002 Paris",
+        "name": "10 Rue de la Paix",
+        "postcode": "75002",
+        "citycode": "75102",
+        "city": "Paris",
+        "context": "75, Paris, Île-de-France",
+        "type": "housenumber",
+        "id": "75102_6998_00010"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.188267, 48.97544]
+      },
+      "properties": {
+        "label": "10 Rue de la Paix 95240 Cormeilles-en-Parisis",
+        "name": "10 Rue de la Paix",
+        "postcode": "95240",
+        "citycode": "95176",
+        "city": "Cormeilles-en-Parisis",
+        "context": "95, Val-d'Oise, Île-de-France",
+        "type": "housenumber",
+        "id": "95176_0960_00010"
+      }
+    }
+  ]
+}

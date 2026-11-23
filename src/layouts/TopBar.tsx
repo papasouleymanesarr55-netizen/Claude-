@@ -1,9 +1,9 @@
 import { PanelRight, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useMatches, useNavigate, useSearchParams } from 'react-router';
+import { useLocation, useMatches } from 'react-router';
+import { SearchBox } from '@/features/search/SearchBox';
 import { IconButton } from '@/components/ui/IconButton';
-import { cn } from '@/lib/cn';
 import { MQ_DESKTOP_UP, useMediaQuery } from '@/lib/useMediaQuery';
 import { useShellState } from './shellState';
 import { BrandMark } from './BrandMark';
@@ -20,59 +20,6 @@ function useRouteHandle(): RouteHandle | undefined {
   const matches = useMatches();
   return [...matches].reverse().find((m) => (m.handle as RouteHandle | undefined)?.titleKey)
     ?.handle as RouteHandle | undefined;
-}
-
-function SearchField({ autoFocus, className }: { autoFocus?: boolean; className?: string }) {
-  const { t } = useTranslation();
-  const handle = useRouteHandle();
-  const [params, setParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [value, setValue] = useState(params.get('q') ?? '');
-
-  // Garde le champ synchronisé avec l'URL (navigation, réinitialisation des filtres…).
-  const urlQuery = params.get('q') ?? '';
-  const [lastUrlQuery, setLastUrlQuery] = useState(urlQuery);
-  if (urlQuery !== lastUrlQuery) {
-    setLastUrlQuery(urlQuery);
-    setValue(urlQuery);
-  }
-
-  const apply = (q: string) => {
-    setValue(q);
-    if (handle?.searchable) {
-      setParams(
-        (prev) => {
-          const next = new URLSearchParams(prev);
-          if (q) next.set('q', q);
-          else next.delete('q');
-          return next;
-        },
-        { replace: true },
-      );
-    } else if (q) {
-      navigate(`/explorer?q=${encodeURIComponent(q)}`);
-    }
-  };
-
-  return (
-    <label
-      className={cn(
-        'flex h-11 items-center gap-2.5 rounded-full border border-white/[0.05] bg-card px-4 text-muted transition-colors focus-within:border-accent/40',
-        className,
-      )}
-    >
-      <Search aria-hidden className="size-4 shrink-0" />
-      <span className="sr-only">{t('topbar.searchLabel')}</span>
-      <input
-        type="search"
-        value={value}
-        autoFocus={autoFocus}
-        onChange={(e) => apply(e.target.value)}
-        placeholder={t('topbar.search')}
-        className="w-full min-w-0 bg-transparent text-[13.5px] text-text placeholder:text-muted/80 focus:outline-none"
-      />
-    </label>
-  );
 }
 
 export function TopBar() {
@@ -119,7 +66,7 @@ export function TopBar() {
       <div className="flex h-14 items-center justify-between gap-3 px-4 md:hidden">
         {mobileSearch ? (
           <>
-            <SearchField autoFocus className="h-10 flex-1" />
+            <SearchBox searchable={handle?.searchable ?? false} autoFocus className="flex-1" />
             <IconButton label={t('topbar.closeSearch')} onClick={() => setMobileSearch(false)}>
               <X className="size-5" />
             </IconButton>
@@ -153,7 +100,7 @@ export function TopBar() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <SearchField className="w-[260px] lg:w-[320px]" />
+          <SearchBox searchable={handle?.searchable ?? false} className="w-[280px] lg:w-[340px]" />
           {actions}
           {avatar}
         </div>

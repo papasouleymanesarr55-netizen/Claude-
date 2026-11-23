@@ -87,7 +87,7 @@ describe('géolocalisation dans l’application', () => {
     await screen.findByText('15 établissements');
     fireEvent.click(screen.getByRole('button', { name: 'Utiliser ma position' }));
     expect(await screen.findByText('Votre position')).toBeInTheDocument();
-    expect(screen.getByText('Précision ± 25 m')).toBeInTheDocument();
+    expect(screen.getByText(/Précision ± 25 m/)).toBeInTheDocument();
     // Aucun établissement de démonstration autour de Lyon : rien n'est inventé.
     expect(
       await screen.findByText('Aucun établissement ne correspond à votre recherche.'),
@@ -120,6 +120,7 @@ describe('géolocalisation dans l’application', () => {
     renderApp('/', () =>
       Promise.resolve({
         places: [createDemoPlacesProvider(['charging'])],
+        geocoding: null,
         categories: ['charging'],
         defaultLocation: null,
         vehicles: [],

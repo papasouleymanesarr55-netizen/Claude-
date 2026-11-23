@@ -30,7 +30,7 @@ describe('Application', () => {
   it('recherche un établissement depuis la barre supérieure', async () => {
     renderApp('/');
     await screen.findByText('15 établissements');
-    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'bastille' } });
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'bastille' } });
     expect(await screen.findByText('1 établissement')).toBeInTheDocument();
   });
 

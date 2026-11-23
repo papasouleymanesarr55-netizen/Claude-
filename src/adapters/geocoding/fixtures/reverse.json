@@ -1,0 +1,22 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.363415, 48.867022]
+      },
+      "properties": {
+        "label": "Place de la République 75003 Paris,Paris 3e Arrondissement",
+        "name": "Place de la République",
+        "postcode": "75003",
+        "citycode": "75103",
+        "city": "Paris",
+        "context": "75, Paris, Île-de-France",
+        "type": "street",
+        "id": "75103_8159"
+      }
+    }
+  ]
+}

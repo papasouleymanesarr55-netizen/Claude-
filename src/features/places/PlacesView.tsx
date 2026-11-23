@@ -90,8 +90,13 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
     ? null
     : location.isDemo
       ? t('demo.location')
-      : location.source === 'device' && location.accuracyM != null && location.accuracyM > 0
-        ? t('location.accuracy', { meters: location.accuracyM })
+      : location.source === 'device'
+        ? [
+            location.context,
+            location.accuracyM ? t('location.accuracy', { meters: location.accuracyM }) : null,
+          ]
+            .filter(Boolean)
+            .join(' · ') || null
         : (location.context ?? null);
 
   const mapProps = {

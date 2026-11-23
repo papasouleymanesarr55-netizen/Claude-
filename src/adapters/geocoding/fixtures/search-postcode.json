@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.869577, 45.751578]
+      },
+      "properties": {
+        "label": "Lyon 3e Arrondissement",
+        "name": "Lyon 3e Arrondissement",
+        "postcode": "69003",
+        "citycode": "69383",
+        "city": "Lyon 3e Arrondissement",
+        "context": "69, Rhône, Auvergne-Rhône-Alpes",
+        "type": "municipality",
+        "id": "69383"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.861099, 45.75651]
+      },
+      "properties": {
+        "label": "Rue Paul Bert 69003 Lyon",
+        "name": "Rue Paul Bert",
+        "postcode": "69003",
+        "citycode": "69383",
+        "city": "Lyon",
+        "context": "69, Rhône, Auvergne-Rhône-Alpes",
+        "type": "street",
+        "id": "69383_5245"
+      }
+    }
+  ]
+}

@@ -58,7 +58,7 @@ test('filtrer par catégorie met à jour la liste et la carte', async ({ page })
 test('la recherche filtre les établissements', async ({ page, viewport }) => {
   await page.goto('/');
   if (isMobile(viewport?.width)) await page.getByRole('button', { name: 'Rechercher' }).click();
-  await page.getByRole('searchbox').fill('bastille');
+  await page.getByRole('combobox').fill('bastille');
   await expect(page.getByRole('article')).toHaveCount(1);
   await expect(page.getByRole('article')).toContainText('Borne démo · Bastille');
 });

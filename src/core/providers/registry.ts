@@ -1,10 +1,13 @@
 import type { CategoryId } from '@/features/places/types';
 import type { ReferenceLocation } from '@/features/data/types';
 import type { Vehicle } from '@/features/vehicles/types';
-import type { PlacesProvider } from './types';
+import { geoplateformeGeocoder } from '@/adapters/geocoding/geoplateforme';
+import type { GeocodingProvider, PlacesProvider } from './types';
 
 export interface ProviderSetup {
   places: PlacesProvider[];
+  /** Recherche d'adresse et nom du lieu d'une position (null : recherche d'adresse indisponible). */
+  geocoding: GeocodingProvider | null;
   /** Catégories couvertes par au moins un fournisseur (les autres sont masquées). */
   categories: CategoryId[];
   /** Position de départ quand l'utilisateur n'a pas encore choisi (démo uniquement). */
@@ -39,6 +42,7 @@ export async function loadProviders(): Promise<ProviderSetup> {
 
   return {
     places,
+    geocoding: geoplateformeGeocoder,
     categories: [...new Set(places.flatMap((p) => p.categories))],
     defaultLocation,
     vehicles,

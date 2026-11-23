@@ -35,7 +35,7 @@
     "directionsDisabled": "Itinéraire disponible avec les données réelles"
   },
   "topbar": {
-    "search": "Rechercher un service, une adresse…",
+    "search": "Adresse, ville, code postal ou établissement…",
     "searchLabel": "Rechercher",
     "guest": "Invité",
     "guestInitials": "IN",
@@ -170,5 +170,15 @@
         "text": "La géolocalisation n’est disponible que sur une connexion sécurisée (HTTPS)."
       }
     }
+  },
+  "search": {
+    "suggestions": "Suggestions",
+    "addresses": "Adresses et villes",
+    "places": "Établissements à proximité",
+    "loading": "Recherche…",
+    "noResults": "Aucun résultat",
+    "error": "Recherche d’adresse momentanément indisponible.",
+    "addressUnavailable": "Adresses momentanément indisponibles.",
+    "attribution": "Adresses : IGN – Base Adresse Nationale"
   }
 }

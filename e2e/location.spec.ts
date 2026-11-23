@@ -13,7 +13,8 @@ test.describe('géolocalisation accordée', () => {
     if (isMobile(viewport?.width))
       await page.getByRole('button', { name: 'Afficher la liste' }).click();
     await page.getByRole('button', { name: 'Utiliser ma position' }).click();
-    await expect(page.getByText('Votre position')).toBeVisible();
+    // Nom du lieu obtenu par géocodage inverse (IGN).
+    await expect(page.getByText('Place de la République')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Actualiser ma position' })).toBeVisible();
     const map = page.getByRole('region', { name: 'Carte des services automobiles' });
     test.skip(await page.getByText('Carte indisponible').isVisible(), 'WebGL indisponible');
@@ -54,4 +55,19 @@ test('déplacer la carte propose « Rechercher dans cette zone »', async ({ pag
   await expect(button).toBeVisible();
   await button.click();
   await expect(button).toBeHidden();
+});
+
+test('rechercher une ville déplace la zone de recherche', async ({ page, viewport }) => {
+  await page.goto('/');
+  if (isMobile(viewport?.width)) await page.getByRole('button', { name: 'Rechercher' }).click();
+  const box = page.getByRole('combobox');
+  await box.fill('lyon');
+  const option = page.getByRole('listbox').getByRole('option', { name: /Lyon/ }).first();
+  await expect(option).toBeVisible();
+  await expect(page.getByText('Adresses : IGN – Base Adresse Nationale')).toBeVisible();
+  await option.click();
+  if (isMobile(viewport?.width))
+    await page.getByRole('button', { name: 'Afficher la liste' }).click();
+  await expect(page.getByText('Lyon', { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole('article')).toHaveCount(0);
 });

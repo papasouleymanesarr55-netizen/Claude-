@@ -1,4 +1,13 @@
+import { readFileSync } from 'node:fs';
 import { test as base, expect } from '@playwright/test';
+
+const geoFixture = (name: string): unknown =>
+  JSON.parse(
+    readFileSync(
+      new URL(`../src/adapters/geocoding/fixtures/${name}.json`, import.meta.url),
+      'utf8',
+    ),
+  );
 
 /**
  * Les tests n'appellent pas le serveur de tuiles : le style OpenFreeMap est remplacé
@@ -35,6 +44,18 @@ export const test = base.extend({
       if (url.endsWith('/planet')) return route.fulfill({ json: stubTileJson });
       // Tuile vectorielle vide (valide).
       return route.fulfill({ status: 200, contentType: 'application/x-protobuf', body: '' });
+    });
+    // Géocodage IGN simulé à partir de réponses réelles enregistrées.
+    await page.route('https://data.geopf.fr/geocodage/**', (route) => {
+      const url = new URL(route.request().url());
+      const name = url.pathname.endsWith('/reverse')
+        ? 'reverse'
+        : /^\d{5}$/.test(url.searchParams.get('q') ?? '')
+          ? 'search-postcode'
+          : /rue/i.test(url.searchParams.get('q') ?? '')
+            ? 'search-address'
+            : 'search-city';
+      return route.fulfill({ json: geoFixture(name) });
     });
     await use(page);
   },

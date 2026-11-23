@@ -8,6 +8,7 @@ import { DataProvider } from '@/features/data/DataProvider';
 
 export const emptySetup: ProviderSetup = {
   places: [],
+  geocoding: null,
   categories: [],
   defaultLocation: null,
   vehicles: [],

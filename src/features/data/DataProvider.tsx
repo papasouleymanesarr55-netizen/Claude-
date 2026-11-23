@@ -1,7 +1,7 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { loadProviders, type ProviderSetup } from '@/core/providers/registry';
-import type { AreaQuery, ProviderInfo } from '@/core/providers/types';
+import type { AreaQuery, GeocodingProvider, ProviderInfo } from '@/core/providers/types';
 import { areaCacheKey, DEFAULT_RADIUS_M } from '@/features/location/area';
 import {
   GeolocationFailure,
@@ -33,6 +33,7 @@ export interface DataState {
   /** Catégories réellement couvertes par un fournisseur. */
   categories: CategoryId[];
   providers: ProviderInfo[];
+  geocoding: GeocodingProvider | null;
   /** Fournisseurs en échec : leurs données sont absentes, jamais remplacées. */
   failedProviders: ProviderInfo[];
   geolocation: { status: GeolocationStatus; error: GeolocationErrorKind | null };
@@ -55,6 +56,7 @@ const initialState: DataState = {
   vehicles: [],
   categories: [],
   providers: [],
+  geocoding: null,
   failedProviders: [],
   geolocation: { status: 'idle', error: null },
   requestGeolocation: noop,
@@ -108,6 +110,7 @@ export function DataProvider({
     })),
   });
 
+  const geocoding = setup?.geocoding ?? null;
   const requestGeolocation = useCallback(() => {
     setGeoStatus('pending');
     setGeoError(null);
@@ -116,12 +119,24 @@ export function DataProvider({
         setUserLocation({ label: null, position, isDemo: false, source: 'device', accuracyM });
         setAreaCenter(null);
         setGeoStatus('granted');
+        // Nom du lieu (facultatif) : en cas d'échec, « Votre position » reste affiché.
+        geocoding
+          ?.reverse(position)
+          .then((place) => {
+            if (!place) return;
+            setUserLocation((current) =>
+              current?.source === 'device' && current.position === position
+                ? { ...current, label: place.label, context: place.context }
+                : current,
+            );
+          })
+          .catch(() => {});
       })
       .catch((e: unknown) => {
         setGeoStatus('error');
         setGeoError(e instanceof GeolocationFailure ? e.kind : 'unavailable');
       });
-  }, []);
+  }, [geocoding]);
 
   const setLocation = useCallback((loc: ReferenceLocation) => {
     setUserLocation(loc);
@@ -159,6 +174,7 @@ export function DataProvider({
       vehicles: setup?.vehicles ?? [],
       categories: setup?.categories ?? [],
       providers: providers.map((p) => p.info),
+      geocoding,
       failedProviders,
       geolocation: { status: geoStatus, error: geoError },
       requestGeolocation,
@@ -180,6 +196,7 @@ export function DataProvider({
     requestGeolocation,
     setLocation,
     retry,
+    geocoding,
   ]);
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

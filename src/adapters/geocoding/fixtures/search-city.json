@@ -1,0 +1,39 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [4.835, 45.758]
+      },
+      "properties": {
+        "label": "Lyon",
+        "name": "Lyon",
+        "postcode": "69001",
+        "citycode": "69123",
+        "city": "Lyon",
+        "context": "69, Rhône, Auvergne-Rhône-Alpes",
+        "type": "municipality",
+        "id": "69123"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-2.531651, 47.544045]
+      },
+      "properties": {
+        "label": "Lyonne 56190 Ambon",
+        "name": "Lyonne",
+        "postcode": "56190",
+        "citycode": "56002",
+        "city": "Ambon",
+        "context": "56, Morbihan, Bretagne",
+        "type": "street",
+        "id": "56002_vj624p"
+      }
+    }
+  ]
+}

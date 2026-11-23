@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 import { __resetFavorites } from '@/features/favorites/useFavorites';
 import '@/i18n';
 
@@ -11,7 +11,16 @@ vi.mock('@/features/map/LazyMapView', () => ({
   ),
 }));
 
+// Aucun appel réseau réel en test : chaque test qui en a besoin fournit sa propre réponse.
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.reject(new TypeError('Réseau désactivé en test'))),
+  );
+});
+
 afterEach(() => {
+  vi.unstubAllGlobals();
   cleanup();
   __resetFavorites();
 });
