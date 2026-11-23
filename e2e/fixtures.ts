@@ -36,6 +36,14 @@ const stubTileJson = {
   vector_layers: [{ id: 'water', fields: {} }],
 };
 
+const fuelFixture = (city: 'paris' | 'lyon'): unknown =>
+  JSON.parse(
+    readFileSync(
+      new URL(`../src/adapters/places/fixtures/fuel-${city}.json`, import.meta.url),
+      'utf8',
+    ),
+  );
+
 export const test = base.extend({
   page: async ({ page }, use) => {
     await page.route('https://tiles.openfreemap.org/**', (route) => {
@@ -44,6 +52,11 @@ export const test = base.extend({
       if (url.endsWith('/planet')) return route.fulfill({ json: stubTileJson });
       // Tuile vectorielle vide (valide).
       return route.fulfill({ status: 200, contentType: 'application/x-protobuf', body: '' });
+    });
+    // Prix des carburants simulés à partir de réponses réelles enregistrées (Paris, Lyon).
+    await page.route('https://data.economie.gouv.fr/**', (route) => {
+      const where = new URL(route.request().url()).searchParams.get('where') ?? '';
+      return route.fulfill({ json: fuelFixture(where.includes('POINT(4.') ? 'lyon' : 'paris') });
     });
     // Géocodage IGN simulé à partir de réponses réelles enregistrées.
     await page.route('https://data.geopf.fr/geocodage/**', (route) => {

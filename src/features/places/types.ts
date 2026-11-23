@@ -6,10 +6,16 @@ export interface PlaceDetail {
   label: string;
   value: string;
   unit: string | null;
+  /** Texte complet (infobulle et lecteurs d'écran). */
+  hint?: string;
+  /** « warning » : information à prendre avec précaution (ex. prix ancien). */
+  tone?: 'warning' | undefined;
 }
 
 export interface PlacePrice {
   amount: number;
+  /** Nombre de décimales affichées (3 pour les carburants, 2 par défaut). */
+  decimals?: number;
   /** Unité après « € / » : kWh, L, h… Chaîne vide pour un prix forfaitaire. */
   unit: string;
 }
@@ -32,6 +38,8 @@ export interface Place {
   /** Deux caractéristiques clés affichées sur la carte (type, puissance, places…). */
   details: PlaceDetail[];
   openingHours: string | null;
+  /** Tous les prix relevés (stations-service uniquement). */
+  fuelPrices?: { fuel: string; amount: number; updatedAt: string }[];
   source: PlaceSource;
 }
 

@@ -23,11 +23,11 @@ export function formatDistance(meters: number): ValueWithUnit {
 }
 
 /** Prix : « 1,79 » + « €/L ». */
-export function formatPrice(amount: number, unit: string): ValueWithUnit {
+export function formatPrice(amount: number, unit: string, decimals = 2): ValueWithUnit {
   return {
     value: new Intl.NumberFormat(LOCALE, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
     }).format(amount),
     unit: `€${unit ? `/${unit}` : ''}`,
   };

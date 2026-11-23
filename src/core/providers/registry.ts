@@ -2,6 +2,7 @@ import type { CategoryId } from '@/features/places/types';
 import type { ReferenceLocation } from '@/features/data/types';
 import type { Vehicle } from '@/features/vehicles/types';
 import { geoplateformeGeocoder } from '@/adapters/geocoding/geoplateforme';
+import { fuelGouvProvider } from '@/adapters/places/fuel-gouv';
 import type { GeocodingProvider, PlacesProvider } from './types';
 
 export interface ProviderSetup {
@@ -22,7 +23,8 @@ export interface ProviderSetup {
  * est éliminé du bundle (voir build/demo-guard.ts).
  */
 export async function loadProviders(): Promise<ProviderSetup> {
-  const places: PlacesProvider[] = [];
+  // Sources réelles, actives dans tous les builds.
+  const places: PlacesProvider[] = [fuelGouvProvider];
   let defaultLocation: ReferenceLocation | null = null;
   let vehicles: Vehicle[] = [];
 

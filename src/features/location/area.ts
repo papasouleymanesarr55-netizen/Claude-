@@ -12,3 +12,10 @@ export function zoomForRadius(radiusM: number): number {
 export function areaCacheKey(center: LatLng, radiusM: number): string {
   return `${center.lat.toFixed(3)},${center.lng.toFixed(3)},${radiusM}`;
 }
+
+/** Emprise [ouest, sud, est, nord] qui contient le cercle de recherche. */
+export function radiusBounds(center: LatLng, radiusM: number): [number, number, number, number] {
+  const dLat = radiusM / 111_320;
+  const dLng = radiusM / (111_320 * Math.cos((center.lat * Math.PI) / 180));
+  return [center.lng - dLng, center.lat - dLat, center.lng + dLng, center.lat + dLat];
+}

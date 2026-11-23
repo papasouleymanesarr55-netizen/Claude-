@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { fetchJson } from '@/core/providers/http';
 import {
   ProviderError,
   type GeocodingKind,
@@ -52,19 +53,12 @@ function toResult(raw: unknown): GeocodingResult | null {
 }
 
 async function request(path: string, params: Record<string, string>, signal?: AbortSignal) {
-  const url = `${BASE_URL}/${path}?${new URLSearchParams(params)}`;
-  let res: Response;
-  try {
-    res = await fetch(url, signal ? { signal } : {});
-  } catch (e) {
-    if (e instanceof DOMException && e.name === 'AbortError')
-      throw new ProviderError('geoplateforme', 'aborted', 'Requête annulée');
-    throw new ProviderError('geoplateforme', 'network', 'Service de géocodage injoignable');
-  }
-  if (res.status === 429)
-    throw new ProviderError('geoplateforme', 'rate-limit', 'Trop de requêtes de géocodage');
-  if (!res.ok) throw new ProviderError('geoplateforme', 'http', `Géocodage : HTTP ${res.status}`);
-  const body = responseSchema.safeParse(await res.json());
+  const json = await fetchJson(
+    'geoplateforme',
+    `${BASE_URL}/${path}?${new URLSearchParams(params)}`,
+    signal,
+  );
+  const body = responseSchema.safeParse(json);
   if (!body.success)
     throw new ProviderError('geoplateforme', 'invalid-data', 'Réponse de géocodage invalide');
   return body.data.features.map(toResult).filter((r): r is GeocodingResult => r !== null);

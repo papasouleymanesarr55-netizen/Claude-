@@ -32,7 +32,8 @@
     "banner": "Données de démonstration : les établissements, prix et véhicules affichés sont fictifs.",
     "priceLabel": "Prix démo",
     "location": "Position de démonstration",
-    "directionsDisabled": "Itinéraire disponible avec les données réelles"
+    "directionsDisabled": "Itinéraire disponible avec les données réelles",
+    "bannerMixed": "Les éléments marqués « Démo » sont fictifs. Les autres données sont réelles et sourcées."
   },
   "topbar": {
     "search": "Adresse, ville, code postal ou établissement…",

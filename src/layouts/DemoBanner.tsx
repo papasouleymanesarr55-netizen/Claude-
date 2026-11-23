@@ -5,7 +5,8 @@ import { useData } from '@/features/data/DataProvider';
 /** Bandeau permanent tant que l'application affiche des données de démonstration. */
 export function DemoBanner() {
   const { t } = useTranslation();
-  const { isDemo } = useData();
+  const { isDemo, providers } = useData();
+  const mixed = providers.some((p) => !p.isDemo);
   if (!isDemo) return null;
   return (
     <div
@@ -13,7 +14,7 @@ export function DemoBanner() {
       className="flex h-[var(--banner-h)] items-center justify-center gap-2 border-b border-accent/15 bg-accent/[0.07] px-4 text-center text-[12px] text-accent"
     >
       <FlaskConical aria-hidden className="size-3.5 shrink-0" />
-      <span className="truncate">{t('demo.banner')}</span>
+      <span className="truncate">{mixed ? t('demo.bannerMixed') : t('demo.banner')}</span>
     </div>
   );
 }

@@ -10,7 +10,7 @@ import type { PlaceWithDistance } from '@/features/places/types';
 import { cn } from '@/lib/cn';
 import type { LatLng } from '@/lib/geo';
 import { MapPin } from './MapPin';
-import { zoomForRadius } from '@/features/location/area';
+import { radiusBounds } from '@/features/location/area';
 import { applyBrandPalette, MAP_STYLE_URL } from './mapStyle';
 
 export interface MapViewProps {
@@ -77,8 +77,9 @@ export default function MapView({
         style: MAP_STYLE_URL,
         transformStyle: (_prev: StyleSpecification | undefined, next: StyleSpecification) =>
           applyBrandPalette(next),
-        center: [start.lng, start.lat],
-        zoom: focus ? zoomForRadius(focus.radiusM) : 5,
+        ...(focus
+          ? { bounds: radiusBounds(focus.center, focus.radiusM), fitBoundsOptions: { padding: 16 } }
+          : { center: [start.lng, start.lat] as [number, number], zoom: 5 }),
         attributionControl: { compact: true },
         dragRotate: false,
         pitchWithRotate: false,
@@ -142,11 +143,7 @@ export default function MapView({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !focus) return;
-    map.easeTo({
-      center: [focus.center.lng, focus.center.lat],
-      zoom: zoomForRadius(focus.radiusM),
-      duration: 700,
-    });
+    map.fitBounds(radiusBounds(focus.center, focus.radiusM), { padding: 16, duration: 700 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusKey]);
 

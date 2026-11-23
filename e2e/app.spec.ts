@@ -31,13 +31,19 @@ test('toutes les pages se chargent sans erreur ni défilement horizontal', async
 
 test('les données de démonstration sont clairement identifiées', async ({ page }) => {
   await page.goto('/');
-  await expect(
-    page.getByRole('status').filter({ hasText: 'Données de démonstration' }),
-  ).toBeVisible();
-  const cards = page.getByRole('article');
-  await expect(cards).toHaveCount(15);
-  for (const card of await cards.all()) {
+  await expect(page.getByRole('status').filter({ hasText: 'sont fictifs' })).toBeVisible();
+  // 12 établissements de démonstration + 3 stations-service réelles (réponse enregistrée).
+  await expect(page.getByRole('article')).toHaveCount(15);
+  const demo = page.locator('article[data-place-id^="demo-"]');
+  await expect(demo).toHaveCount(12);
+  for (const card of await demo.all()) {
     await expect(card.getByText('Démo', { exact: true })).toHaveCount(1);
+  }
+  const real = page.locator('article[data-place-id^="fuel-"]');
+  await expect(real).toHaveCount(3);
+  for (const card of await real.all()) {
+    await expect(card.getByText('Démo', { exact: true })).toHaveCount(0);
+    await expect(card.getByText('Relevé', { exact: true })).toBeAttached();
   }
   await expect(
     page.getByRole('button', { name: 'Itinéraire disponible avec les données réelles' }).first(),

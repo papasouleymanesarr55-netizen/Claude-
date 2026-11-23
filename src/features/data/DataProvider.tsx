@@ -36,6 +36,8 @@ export interface DataState {
   geocoding: GeocodingProvider | null;
   /** Fournisseurs en échec : leurs données sont absentes, jamais remplacées. */
   failedProviders: ProviderInfo[];
+  /** Catégories dont au moins un fournisseur charge encore. */
+  loadingCategories: CategoryId[];
   geolocation: { status: GeolocationStatus; error: GeolocationErrorKind | null };
   requestGeolocation: () => void;
   setLocation: (location: ReferenceLocation) => void;
@@ -58,6 +60,7 @@ const initialState: DataState = {
   providers: [],
   geocoding: null,
   failedProviders: [],
+  loadingCategories: [],
   geolocation: { status: 'idle', error: null },
   requestGeolocation: noop,
   setLocation: noop,
@@ -149,6 +152,9 @@ export function DataProvider({
 
   const value = useMemo<DataState>(() => {
     const failedProviders = providers.filter((_, i) => results[i]?.isError).map((p) => p.info);
+    const loadingCategories = providers
+      .filter((_, i) => results[i]?.isFetching && !results[i]?.data)
+      .flatMap((p) => p.categories);
     const origin = location?.position ?? null;
     const places: PlaceWithDistance[] = results.flatMap((r) =>
       (r.data ?? []).map((p) => ({
@@ -176,6 +182,7 @@ export function DataProvider({
       providers: providers.map((p) => p.info),
       geocoding,
       failedProviders,
+      loadingCategories,
       geolocation: { status: geoStatus, error: geoError },
       requestGeolocation,
       setLocation,

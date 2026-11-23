@@ -69,5 +69,7 @@ test('rechercher une ville déplace la zone de recherche', async ({ page, viewpo
   if (isMobile(viewport?.width))
     await page.getByRole('button', { name: 'Afficher la liste' }).click();
   await expect(page.getByText('Lyon', { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole('article')).toHaveCount(0);
+  // Autour de Lyon : stations-service réelles, aucun établissement de démonstration (tous à Paris).
+  await expect(page.locator('article[data-place-id^="fuel-"]').first()).toBeAttached();
+  await expect(page.locator('article[data-place-id^="demo-"]')).toHaveCount(0);
 });

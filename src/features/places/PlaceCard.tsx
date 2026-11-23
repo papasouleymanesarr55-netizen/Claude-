@@ -16,12 +16,31 @@ interface PlaceCardProps {
   style?: CSSProperties;
 }
 
-function Stat({ label, value, unit }: { label: string; value: string; unit?: string | null }) {
+function Stat({
+  label,
+  value,
+  unit,
+  hint,
+  tone,
+}: {
+  label: string;
+  value: string;
+  unit?: string | null;
+  hint?: string | undefined;
+  tone?: 'warning' | undefined;
+}) {
   return (
     <div className="min-w-0">
       <dt className="truncate text-[11px] text-muted">{label}</dt>
-      <dd className="mt-0.5 truncate text-[15px] font-medium tabular-nums">
-        {value}
+      <dd
+        title={hint}
+        className={cn(
+          'mt-0.5 truncate text-[15px] font-medium tabular-nums',
+          tone === 'warning' && 'text-[#e5a148]',
+        )}
+      >
+        {hint && <span className="sr-only">{hint}</span>}
+        <span aria-hidden={hint ? true : undefined}>{value}</span>
         {unit && <span className="ml-0.5 text-[12px] font-normal text-muted">{unit}</span>}
       </dd>
     </div>
@@ -32,7 +51,9 @@ export function PlaceCard({ place, selected = false, onSelect, className, style 
   const { t } = useTranslation();
   const Icon = getCategory(place.category).icon;
   const distance = place.distanceM != null ? formatDistance(place.distanceM) : null;
-  const price = place.price ? formatPrice(place.price.amount, place.price.unit) : null;
+  const price = place.price
+    ? formatPrice(place.price.amount, place.price.unit, place.price.decimals)
+    : null;
   const priceLabel = place.source.isDemo ? t('demo.priceLabel') : t('places.price');
   const [first, second] = place.details;
 
@@ -90,8 +111,8 @@ export function PlaceCard({ place, selected = false, onSelect, className, style 
         {place.services.length > 0 && ` · ${place.services.slice(0, 3).join(' · ')}`}
       </p>
 
-      <dl className="mt-4 grid grid-cols-[1fr_1.45fr_0.9fr] gap-3 border-t border-white/[0.05] pt-4">
-        {first && <Stat label={first.label} value={first.value} unit={first.unit} />}
+      <dl className="mt-4 flex justify-between gap-3 border-t border-white/[0.05] pt-4">
+        {first && <Stat {...first} />}
         {price ? (
           <Stat label={priceLabel} value={price.value} unit={price.unit} />
         ) : (
@@ -100,7 +121,7 @@ export function PlaceCard({ place, selected = false, onSelect, className, style 
             <dd className="mt-1 truncate text-[12.5px] text-muted">{t('places.notProvided')}</dd>
           </div>
         )}
-        {second && <Stat label={second.label} value={second.value} unit={second.unit} />}
+        {second && <Stat {...second} />}
       </dl>
     </article>
   );

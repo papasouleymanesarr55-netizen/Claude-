@@ -163,6 +163,11 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
           text={t('places.errorText')}
         />
       );
+    const waiting = (activeCategories.length ? activeCategories : availableCategories).some((c) =>
+      data.loadingCategories.includes(c),
+    );
+    if (visible.length === 0 && waiting)
+      return <p className="px-1 py-6 text-sm text-muted">{t('places.loading')}</p>;
     if (visible.length === 0)
       return (
         <EmptyState
