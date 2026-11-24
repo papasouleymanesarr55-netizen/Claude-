@@ -17,7 +17,7 @@ const rows = parse(readFileSync(new URL('./fixtures/sample.csv', import.meta.url
 
 describe('ingestion IRVE (échantillon réel)', () => {
   it('rejette les lignes hors de France ou sans coordonnées, garde les autres', () => {
-    const results = rows.map(parseRow);
+    const results = rows.map((r) => parseRow(r));
     const rejects = results.filter((r) => typeof r === 'string');
     expect(rejects).toEqual(['coordonnees-hors-france', 'coordonnees-hors-france']);
     expect(results.length - rejects.length).toBe(85);
@@ -25,7 +25,7 @@ describe('ingestion IRVE (échantillon réel)', () => {
 
   it('regroupe les points de charge par station', () => {
     const agg = new StationAggregator();
-    for (const r of rows.map(parseRow)) if (typeof r !== 'string') agg.add(r);
+    for (const r of rows.map((r) => parseRow(r))) if (typeof r !== 'string') agg.add(r);
     const stations = agg.records();
     expect(stations).toHaveLength(15);
     expect(stations.reduce((n, s) => n + s.points, 0)).toBe(85);
@@ -43,6 +43,14 @@ describe('ingestion IRVE (échantillon réel)', () => {
     agg.add(row);
     agg.add(row);
     expect(agg.records()[0]?.points).toBe(1);
+  });
+
+  it('ignore une date de mise à jour dans le futur (donnée incohérente)', () => {
+    const base = rows.find((r) => typeof parseRow(r) !== 'string') ?? {};
+    const future = parseRow({ ...base, date_maj: '2099-01-01' }, '2026-11-24');
+    const past = parseRow({ ...base, date_maj: '2026-11-20' }, '2026-11-24');
+    expect(typeof future !== 'string' && future.updatedAt).toBeNull();
+    expect(typeof past !== 'string' && past.updatedAt).toBe('2026-11-20');
   });
 
   it('normalise la puissance (W → kW, valeurs aberrantes ignorées)', () => {
@@ -63,7 +71,7 @@ describe('ingestion IRVE (échantillon réel)', () => {
   it('découpe en tuiles « slippy map »', () => {
     expect(tileOf(48.8675, 2.3637, 11)).toEqual({ x: 1037, y: 704 });
     const agg = new StationAggregator();
-    for (const r of rows.map(parseRow)) if (typeof r !== 'string') agg.add(r);
+    for (const r of rows.map((r) => parseRow(r))) if (typeof r !== 'string') agg.add(r);
     const tiles = groupByTile(agg.records());
     expect([...tiles.keys()].sort()).toEqual(['1037/704', '1051/730']);
   });

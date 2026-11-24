@@ -87,7 +87,10 @@ export interface PointRow {
   updatedAt: string | null;
 }
 
-export function parseRow(raw: Raw): PointRow | RejectReason {
+/** Date du jour (AAAA-MM-JJ) : les dates de mise à jour postérieures sont ignorées. */
+const today = () => new Date().toISOString().slice(0, 10);
+
+export function parseRow(raw: Raw, maxDate: string = today()): PointRow | RejectReason {
   const lat = Number.parseFloat(clean(raw.consolidated_latitude));
   const lng = Number.parseFloat(clean(raw.consolidated_longitude));
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0))
@@ -114,7 +117,10 @@ export function parseRow(raw: Raw): PointRow | RejectReason {
     free: bool(raw.gratuit),
     pricing: pricing && pricing.toLowerCase() !== 'inconnu' ? pricing.slice(0, 300) : null,
     operator: clean(raw.nom_enseigne) || clean(raw.nom_operateur) || null,
-    updatedAt: /^\d{4}-\d{2}-\d{2}/.test(updatedAt) ? updatedAt.slice(0, 10) : null,
+    updatedAt:
+      /^\d{4}-\d{2}-\d{2}/.test(updatedAt) && updatedAt.slice(0, 10) <= maxDate
+        ? updatedAt.slice(0, 10)
+        : null,
   };
 }
 
