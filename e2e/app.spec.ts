@@ -32,10 +32,9 @@ test('toutes les pages se chargent sans erreur ni défilement horizontal', async
 test('les données de démonstration sont clairement identifiées', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('status').filter({ hasText: 'sont fictifs' })).toBeVisible();
-  // 12 établissements de démonstration + 3 stations-service réelles (réponse enregistrée).
-  await expect(page.getByRole('article')).toHaveCount(15);
+  // Parkings, garages, lavages et pneus : démonstration (8). Carburants et bornes : réels.
   const demo = page.locator('article[data-place-id^="demo-"]');
-  await expect(demo).toHaveCount(12);
+  await expect(demo).toHaveCount(8);
   for (const card of await demo.all()) {
     await expect(card.getByText('Démo', { exact: true })).toHaveCount(1);
   }
@@ -44,6 +43,13 @@ test('les données de démonstration sont clairement identifiées', async ({ pag
   for (const card of await real.all()) {
     await expect(card.getByText('Démo', { exact: true })).toHaveCount(0);
     await expect(card.getByText('Relevé', { exact: true })).toBeAttached();
+  }
+  const chargers = page.locator('article[data-place-id^="irve-"]');
+  await expect(chargers.first()).toBeAttached();
+  for (const card of await chargers.all()) {
+    await expect(card.getByText('Démo', { exact: true })).toHaveCount(0);
+    // Données statiques : aucune disponibilité affichée.
+    await expect(card.getByText('Disponibilité en temps réel non communiquée')).toBeAttached();
   }
   await expect(
     page.getByRole('button', { name: 'Itinéraire disponible avec les données réelles' }).first(),
@@ -58,15 +64,27 @@ test('filtrer par catégorie met à jour la liste et la carte', async ({ page })
     .click();
   await expect(page).toHaveURL(/cat=parking/);
   await expect(page.getByRole('article')).toHaveCount(3);
-  await expect(page.locator('.map-pin')).toHaveCount(3);
+  // Marqueurs isolés + établissements regroupés en grappes = 3 parkings.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.querySelectorAll('.map-pin').length +
+          [...document.querySelectorAll('.map-cluster')].reduce(
+            (n, el) => n + Number(el.textContent),
+            0,
+          ),
+      ),
+    )
+    .toBe(3);
 });
 
 test('la recherche filtre les établissements', async ({ page, viewport }) => {
   await page.goto('/');
   if (isMobile(viewport?.width)) await page.getByRole('button', { name: 'Rechercher' }).click();
-  await page.getByRole('combobox').fill('bastille');
+  await page.getByRole('combobox').fill('bonsergent');
   await expect(page.getByRole('article')).toHaveCount(1);
-  await expect(page.getByRole('article')).toContainText('Borne démo · Bastille');
+  await expect(page.getByRole('article')).toContainText('Lavage démo · Bonsergent');
 });
 
 test('sélectionner un marqueur met en avant l’établissement', async ({ page }) => {
@@ -84,7 +102,7 @@ test('ajouter un favori le retrouve dans « Mes favoris »', async ({ page, view
   if (isMobile(viewport?.width))
     await page.getByRole('button', { name: 'Afficher la liste' }).click();
   await page
-    .locator('[data-place-id="demo-ch-canal"]')
+    .locator('[data-place-id="demo-wa-bonsergent"]')
     .getByRole('button', { name: 'Ajouter aux favoris' })
     .click();
   await page
@@ -94,7 +112,7 @@ test('ajouter un favori le retrouve dans « Mes favoris »', async ({ page, view
   await expect(page).toHaveURL(/\/favoris$/);
   await expect(page.getByRole('heading', { level: 1 }).first()).toHaveText('Mes favoris');
   await expect(page.getByRole('article')).toHaveCount(1);
-  await expect(page.getByRole('article')).toContainText('Borne démo · Canal');
+  await expect(page.getByRole('article')).toContainText('Lavage démo · Bonsergent');
   await expect(page.getByRole('button', { name: 'Mon véhicule' })).toHaveCount(0);
 });
 

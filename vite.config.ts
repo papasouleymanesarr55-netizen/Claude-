@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
     test: {
       environment: 'jsdom',
       setupFiles: ['./src/test/setup.tsx'],
-      include: ['src/**/*.test.{ts,tsx}', 'build/**/*.test.ts'],
+      include: ['src/**/*.test.{ts,tsx}', 'build/**/*.test.ts', 'ingestion/**/*.test.ts'],
       css: false,
     },
   };

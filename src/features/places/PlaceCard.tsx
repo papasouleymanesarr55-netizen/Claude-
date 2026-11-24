@@ -115,6 +115,8 @@ export function PlaceCard({ place, selected = false, onSelect, className, style 
         {first && <Stat {...first} />}
         {price ? (
           <Stat label={priceLabel} value={price.value} unit={price.unit} />
+        ) : place.priceNote ? (
+          <Stat label={priceLabel} value={place.priceNote} hint={place.priceHint} />
         ) : (
           <div className="min-w-0">
             <dt className="truncate text-[11px] text-muted">{priceLabel}</dt>
@@ -123,6 +125,9 @@ export function PlaceCard({ place, selected = false, onSelect, className, style 
         )}
         {second && <Stat {...second} />}
       </dl>
+      {place.category === 'charging' && !place.source.isDemo && !place.availability && (
+        <p className="mt-3 text-[11.5px] text-muted/80">{t('places.availabilityUnknown')}</p>
+      )}
     </article>
   );
 }

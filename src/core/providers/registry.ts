@@ -3,6 +3,7 @@ import type { ReferenceLocation } from '@/features/data/types';
 import type { Vehicle } from '@/features/vehicles/types';
 import { geoplateformeGeocoder } from '@/adapters/geocoding/geoplateforme';
 import { fuelGouvProvider } from '@/adapters/places/fuel-gouv';
+import { irveStaticProvider } from '@/adapters/places/irve-static';
 import type { GeocodingProvider, PlacesProvider } from './types';
 
 export interface ProviderSetup {
@@ -24,7 +25,7 @@ export interface ProviderSetup {
  */
 export async function loadProviders(): Promise<ProviderSetup> {
   // Sources réelles, actives dans tous les builds.
-  const places: PlacesProvider[] = [fuelGouvProvider];
+  const places: PlacesProvider[] = [fuelGouvProvider, irveStaticProvider];
   let defaultLocation: ReferenceLocation | null = null;
   let vehicles: Vehicle[] = [];
 

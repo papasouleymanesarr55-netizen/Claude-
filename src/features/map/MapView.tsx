@@ -2,7 +2,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { Map as MlMap, Marker, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import { LocateFixed, MapPinOff, Minus, Plus } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Supercluster from 'supercluster';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from '@/components/ui/IconButton';
@@ -39,7 +40,12 @@ const FRANCE_CENTER: LatLng = { lat: 46.6, lng: 2.4 };
 interface MarkerEntry {
   marker: Marker;
   el: HTMLElement;
+  /** Grappe de marqueurs proches : nombre d'établissements regroupés. */
+  count?: number;
 }
+
+const CLUSTER_RADIUS_PX = 48;
+const CLUSTER_MAX_ZOOM = 15;
 
 export default function MapView({
   places,
@@ -115,28 +121,82 @@ export default function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Synchronisation des marqueurs avec la liste.
+  // Index de regroupement (grappes) recalculé quand la liste change.
+  const index = useMemo(() => {
+    const sc = new Supercluster<{ id: string }>({
+      radius: CLUSTER_RADIUS_PX,
+      maxZoom: CLUSTER_MAX_ZOOM,
+    });
+    sc.load(
+      places.map((p) => ({
+        type: 'Feature' as const,
+        geometry: { type: 'Point' as const, coordinates: [p.position.lng, p.position.lat] },
+        properties: { id: p.id },
+      })),
+    );
+    return sc;
+  }, [places]);
+
+  // Marqueurs visibles : établissements isolés et grappes, recalculés à chaque déplacement.
+  const [viewVersion, setViewVersion] = useState(0);
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const bump = () => setViewVersion((v) => v + 1);
+    map.on('moveend', bump);
+    return () => {
+      map.off('moveend', bump);
+    };
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const b = map.getBounds();
+    const features = index.getClusters(
+      [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()],
+      Math.round(map.getZoom()),
+    );
     const next = new globalThis.Map<string, MarkerEntry>();
-    for (const place of places) {
+    for (const f of features) {
+      const [lng, lat] = f.geometry.coordinates as [number, number];
       const el = document.createElement('button');
       el.type = 'button';
-      el.className = 'map-pin';
-      el.setAttribute('aria-label', place.name);
-      el.addEventListener('click', (e) => {
-        e.stopPropagation();
-        onSelectRef.current(place.id);
-      });
-      const marker = new Marker({ element: el, anchor: 'bottom' })
-        .setLngLat([place.position.lng, place.position.lat])
-        .addTo(map);
-      next.set(place.id, { marker, el });
+      if ('cluster' in f.properties && f.properties.cluster) {
+        const clusterId = f.properties.cluster_id;
+        const count = f.properties.point_count;
+        el.className = 'map-cluster';
+        el.setAttribute('aria-label', t('map.cluster', { count }));
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          map.easeTo({
+            center: [lng, lat],
+            zoom: Math.min(index.getClusterExpansionZoom(clusterId), CLUSTER_MAX_ZOOM + 1),
+            duration: 500,
+          });
+        });
+        const marker = new Marker({ element: el, anchor: 'center' })
+          .setLngLat([lng, lat])
+          .addTo(map);
+        next.set(`cluster-${clusterId}`, { marker, el, count });
+      } else {
+        const id = (f.properties as { id: string }).id;
+        const place = places.find((p) => p.id === id);
+        el.className = 'map-pin';
+        el.setAttribute('aria-label', place?.name ?? id);
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onSelectRef.current(id);
+        });
+        const marker = new Marker({ element: el, anchor: 'bottom' })
+          .setLngLat([lng, lat])
+          .addTo(map);
+        next.set(id, { marker, el });
+      }
     }
     setMarkers(next);
     return () => next.forEach(({ marker }) => marker.remove());
-  }, [places]);
+  }, [index, places, viewVersion, t]);
 
   // Recentrage quand la zone de recherche change (position, adresse, rayon).
   const focusKey = focus ? `${focus.center.lat},${focus.center.lng},${focus.radiusM}` : null;
@@ -182,7 +242,13 @@ export default function MapView({
   return (
     <div className={cn('relative overflow-hidden bg-[#1a201d]', className)}>
       <div ref={containerRef} className="h-full w-full" role="region" aria-label={t('map.label')} />
-      {[...markers].map(([id, { el }]) => {
+      {[...markers].map(([id, { el, count }]) => {
+        if (count != null)
+          return createPortal(
+            <span className="tabular-nums">{count > 999 ? '999+' : count}</span>,
+            el,
+            id,
+          );
         const place = places.find((p) => p.id === id);
         return place
           ? createPortal(<MapPin category={place.category} selected={id === selectedId} />, el, id)

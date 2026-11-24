@@ -44,6 +44,9 @@ const fuelFixture = (city: 'paris' | 'lyon'): unknown =>
     ),
   );
 
+const irveFixture = (path: string): string =>
+  readFileSync(new URL(`./fixtures/irve/v1/${path}`, import.meta.url), 'utf8');
+
 export const test = base.extend({
   page: async ({ page }, use) => {
     await page.route('https://tiles.openfreemap.org/**', (route) => {
@@ -57,6 +60,15 @@ export const test = base.extend({
     await page.route('https://data.economie.gouv.fr/**', (route) => {
       const where = new URL(route.request().url()).searchParams.get('where') ?? '';
       return route.fulfill({ json: fuelFixture(where.includes('POINT(4.') ? 'lyon' : 'paris') });
+    });
+    // Bornes IRVE : tuiles construites à partir d'un échantillon réel (ingestion/irve/fixtures).
+    await page.route('**/data/irve/v1/**', (route) => {
+      const path = new URL(route.request().url()).pathname.split('/data/irve/v1/')[1] ?? '';
+      try {
+        return route.fulfill({ body: irveFixture(path), contentType: 'application/json' });
+      } catch {
+        return route.fulfill({ status: 404, body: '' });
+      }
     });
     // Géocodage IGN simulé à partir de réponses réelles enregistrées.
     await page.route('https://data.geopf.fr/geocodage/**', (route) => {

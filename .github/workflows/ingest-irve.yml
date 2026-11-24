@@ -1,0 +1,37 @@
+name: Ingestion IRVE
+
+# Déclenchement manuel uniquement pour l'instant.
+# Le cron quotidien et la publication des tuiles seront activés après validation.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Ingestion de la base nationale IRVE (transport.data.gouv.fr)
+        run: npm run ingest:irve
+      - name: Tuiles IRVE (artefact, conservé 7 jours)
+        uses: actions/upload-artifact@v4
+        with:
+          name: irve-tiles
+          path: public/data/irve/v1
+          retention-days: 7
+      - name: Journal des rejets
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: irve-rejets
+          path: ingestion/out/irve-rejets.csv
+          if-no-files-found: ignore
+          retention-days: 7

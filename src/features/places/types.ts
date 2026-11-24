@@ -34,6 +34,15 @@ export interface Place {
   position: LatLng;
   address: string;
   price: PlacePrice | null;
+  /** Mention affichée à la place d'un prix chiffré (ex. « Gratuit », « Voir tarif »). */
+  priceNote?: string;
+  /** Texte complet du tarif publié (infobulle). */
+  priceHint?: string;
+  /**
+   * Disponibilité en temps réel : null tant qu'aucune source dynamique fiable et récente
+   * n'est branchée. Ne jamais déduire de disponibilité à partir de données statiques.
+   */
+  availability?: { status: 'available' | 'occupied' | 'unknown'; observedAt: string } | null;
   services: string[];
   /** Deux caractéristiques clés affichées sur la carte (type, puissance, places…). */
   details: PlaceDetail[];

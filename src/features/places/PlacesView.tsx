@@ -24,6 +24,8 @@ import { PlaceCard } from './PlaceCard';
 import type { CategoryId } from './types';
 import { usePlaceFilters } from './usePlaceFilters';
 
+const LIST_LIMIT = 60;
+
 interface PlacesViewProps {
   /** Catégories proposées sur cette page (toutes par défaut). */
   scope?: CategoryId[];
@@ -56,6 +58,8 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
     [scoped, activeCategories, filters.query, t],
   );
   const availableCategories = scope.filter((c) => data.categories.includes(c));
+  // La carte montre tout (en grappes) ; la liste se limite aux plus proches.
+  const listed = useMemo(() => visible.slice(0, LIST_LIMIT), [visible]);
 
   const select = useCallback((id: string) => setSelectedId(id), [setSelectedId]);
 
@@ -193,7 +197,7 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
             : 'flex flex-col gap-3',
         )}
       >
-        {visible.map((place, i) => (
+        {listed.map((place, i) => (
           <PlaceCard
             key={place.id}
             place={place}
@@ -207,6 +211,16 @@ export function PlacesView({ scope = categoryIds, headerAction }: PlacesViewProp
             style={{ animationDelay: `${Math.min(i, 6) * 40}ms` }}
           />
         ))}
+        {visible.length > listed.length && (
+          <p
+            className={cn(
+              'text-[12.5px] text-muted',
+              layout === 'row' ? 'w-[220px] shrink-0 self-center px-2' : 'px-1 py-2',
+            )}
+          >
+            {t('places.listLimited', { shown: listed.length, total: visible.length })}
+          </p>
+        )}
       </div>
     );
   };

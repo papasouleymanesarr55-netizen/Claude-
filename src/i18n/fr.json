@@ -64,7 +64,9 @@
     "errorText": "Les données n’ont pas pu être chargées. Réessayez dans un instant.",
     "positionUnknown": "Position non définie",
     "loading": "Chargement…",
-    "partialFailure": "Source momentanément indisponible : {{sources}}. Ses établissements ne sont pas affichés."
+    "partialFailure": "Source momentanément indisponible : {{sources}}. Ses établissements ne sont pas affichés.",
+    "availabilityUnknown": "Disponibilité en temps réel non communiquée",
+    "listLimited": "Les {{shown}} plus proches sont listés sur {{total}}. Affinez avec les filtres ou le rayon."
   },
   "map": {
     "label": "Carte des services automobiles",
@@ -74,7 +76,9 @@
     "unavailable": "Carte indisponible",
     "unavailableText": "La carte n’a pas pu se charger. La liste reste disponible.",
     "locate": "Ma position",
-    "youAreHere": "Vous êtes ici"
+    "youAreHere": "Vous êtes ici",
+    "cluster_one": "{{count}} établissement regroupé, zoomer",
+    "cluster_other": "{{count}} établissements regroupés, zoomer"
   },
   "vehicle": {
     "title": "Mon véhicule",

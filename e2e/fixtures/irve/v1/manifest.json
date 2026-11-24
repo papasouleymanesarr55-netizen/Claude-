@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "zoom": 11,
+  "source": "Base nationale consolidée IRVE – données statiques",
+  "producer": "transport.data.gouv.fr (Point d’Accès National)",
+  "licence": "Licence Ouverte 2.0",
+  "licenceUrl": "https://www.etalab.gouv.fr/licence-ouverte-open-licence/",
+  "datasetUrl": "https://transport.data.gouv.fr/datasets/base-nationale-des-points-de-recharge-pour-vehicules-electriques-en-france-irve",
+  "sourceUrl": "https://proxy.transport.data.gouv.fr/resource/consolidation-transport-irve-statique",
+  "dataUpdatedAt": "2026-11-22",
+  "generatedAt": "2026-11-24T21:54:01.645Z",
+  "rows": 87,
+  "stations": 15,
+  "points": 85,
+  "rejected": { "coordonnees-hors-france": 2 },
+  "tiles": ["1037/704", "1051/730"]
+}
