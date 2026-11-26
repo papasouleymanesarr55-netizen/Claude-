@@ -1,0 +1,188 @@
+{
+  "fr": {
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "sections": [
+        {
+          "h": "En bref",
+          "p": [
+            "Planning Paie ne collecte aucune donnée personnelle. Pas de compte, pas de publicité, pas de mesure d’audience, pas de suivi. Vos plannings et vos montants restent sur votre téléphone."
+          ]
+        },
+        {
+          "h": "Données stockées sur votre appareil",
+          "p": [
+            "Les postes, horaires, taux horaires, notes et réglages que vous saisissez sont enregistrés uniquement dans la mémoire de l’application, sur votre téléphone. Ils ne sont envoyés à aucun serveur de l’éditeur.",
+            "Vous pouvez les exporter à tout moment (Réglages > Exporter une sauvegarde) et les effacer (Réglages > Effacer toutes mes données). La désinstallation de l’application les supprime également."
+          ]
+        },
+        {
+          "h": "Calendrier et notifications (facultatif)",
+          "p": [
+            "Si vous activez la synchronisation, l’application crée un calendrier « Planning Paie » sur votre téléphone et y copie vos postes. Si vous activez les rappels, des notifications locales sont programmées sur votre téléphone. Ces autorisations sont demandées uniquement quand vous activez la fonction et peuvent être retirées dans les réglages du téléphone. Si votre calendrier est synchronisé avec un service en ligne (iCloud, Google…), c’est ce service, choisi par vous, qui en assure la synchronisation."
+          ]
+        },
+        {
+          "h": "Achats intégrés",
+          "p": [
+            "Les abonnements et l’achat Premium sont traités par Apple (App Store) ou Google (Google Play). L’éditeur ne reçoit jamais vos coordonnées bancaires. Pour vérifier vos droits Premium, l’application utilise le service RevenueCat, qui reçoit un identifiant anonyme généré par l’application et les informations d’achat transmises par le store, sans nom, e-mail ni données de planning. Politique de RevenueCat : https://www.revenuecat.com/privacy"
+          ]
+        },
+        {
+          "h": "Sauvegardes et partage",
+          "p": [
+            "Lorsque vous exportez une sauvegarde, une feuille d’heures PDF ou un tableau, le fichier est remis à la feuille de partage de votre téléphone : vous choisissez seul où il est envoyé."
+          ]
+        },
+        {
+          "h": "Enfants",
+          "p": [
+            "L’application s’adresse aux salariés et ne vise pas les enfants de moins de 15 ans."
+          ]
+        },
+        {
+          "h": "Vos droits et contact",
+          "p": [
+            "L’éditeur ne détenant aucune donnée vous concernant, il n’a rien à consulter, rectifier ou supprimer de son côté. Pour toute question : {{EMAIL}}. Vous pouvez aussi saisir la CNIL (www.cnil.fr).",
+            "Éditeur : {{EDITOR}}. Dernière mise à jour : {{UPDATED}}."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Conditions d’utilisation",
+      "sections": [
+        {
+          "h": "Objet",
+          "p": [
+            "Planning Paie permet de noter ses horaires de travail et d’obtenir une estimation de sa rémunération brute et nette."
+          ]
+        },
+        {
+          "h": "Estimation indicative, non contractuelle",
+          "p": [
+            "Les montants affichés sont des estimations calculées à partir des informations que vous saisissez. Ils ne remplacent pas votre fiche de paie, votre contrat de travail ou votre convention collective, et ne constituent pas un conseil juridique ou social. Seule la fiche de paie remise par votre employeur fait foi.",
+            "Les majorations (heures supplémentaires, nuit, dimanche, jours fériés) dépendent de votre situation : vérifiez les taux que vous saisissez."
+          ]
+        },
+        {
+          "h": "Version gratuite et Premium",
+          "p": [
+            "La version gratuite est utilisable sans limite de durée. Premium est proposé en abonnement mensuel ou annuel, renouvelé automatiquement, ou en achat unique. Le prix est affiché avant l’achat. L’abonnement se gère et se résilie depuis les réglages de votre compte Apple ou Google, au moins 24 heures avant la fin de la période en cours. Toute période d’essai non utilisée est perdue lors de l’achat d’un abonnement. Les remboursements relèvent d’Apple ou de Google, selon leurs conditions.",
+            "Le bouton « Restaurer mes achats » permet de retrouver Premium sur un nouvel appareil utilisant le même compte."
+          ]
+        },
+        {
+          "h": "Vos données",
+          "p": [
+            "Vos données restent sur votre appareil. Vous êtes responsable de leur sauvegarde (fonction Exporter). L’éditeur ne peut pas récupérer des données perdues."
+          ]
+        },
+        {
+          "h": "Responsabilité",
+          "p": [
+            "L’application est fournie en l’état. L’éditeur s’efforce d’assurer l’exactitude des calculs mais ne peut être tenu responsable d’un écart entre l’estimation et la rémunération réellement versée."
+          ]
+        },
+        {
+          "h": "Droit applicable et contact",
+          "p": [
+            "Ces conditions sont soumises au droit français. Contact : {{EMAIL}}. Éditeur : {{EDITOR}}. Dernière mise à jour : {{UPDATED}}."
+          ]
+        }
+      ]
+    }
+  },
+  "en": {
+    "privacy": {
+      "title": "Privacy policy",
+      "sections": [
+        {
+          "h": "In short",
+          "p": [
+            "Planning Paie collects no personal data. No account, no ads, no analytics, no tracking. Your schedules and amounts stay on your phone."
+          ]
+        },
+        {
+          "h": "Data stored on your device",
+          "p": [
+            "Shifts, times, hourly rates, notes and settings you enter are stored only inside the app on your phone. They are never sent to the publisher’s servers.",
+            "You can export them at any time (Settings > Export a backup) and erase them (Settings > Erase all my data). Uninstalling the app also deletes them."
+          ]
+        },
+        {
+          "h": "Calendar and notifications (optional)",
+          "p": [
+            "If you turn on sync, the app creates a “Planning Paie” calendar on your phone and copies your shifts into it. If you turn on reminders, local notifications are scheduled on your phone. These permissions are only requested when you enable the feature and can be revoked in the phone settings. If your calendar syncs with an online service you chose (iCloud, Google…), that service handles the sync."
+          ]
+        },
+        {
+          "h": "In-app purchases",
+          "p": [
+            "Subscriptions and the Premium purchase are processed by Apple (App Store) or Google (Google Play). The publisher never receives your payment details. To check Premium access, the app uses RevenueCat, which receives an anonymous identifier generated by the app and the purchase information sent by the store, with no name, email or schedule data. RevenueCat privacy policy: https://www.revenuecat.com/privacy"
+          ]
+        },
+        {
+          "h": "Backups and sharing",
+          "p": [
+            "When you export a backup, a PDF timesheet or a table, the file is handed to your phone’s share sheet: you alone choose where it goes."
+          ]
+        },
+        {
+          "h": "Children",
+          "p": ["The app is intended for employees and is not directed at children under 15."]
+        },
+        {
+          "h": "Your rights and contact",
+          "p": [
+            "As the publisher holds no data about you, there is nothing to access, correct or delete on its side. Questions: {{EMAIL}}.",
+            "Publisher: {{EDITOR}}. Last updated: {{UPDATED}}."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of use",
+      "sections": [
+        {
+          "h": "Purpose",
+          "p": [
+            "Planning Paie lets you record your working hours and get an estimate of your gross and net pay."
+          ]
+        },
+        {
+          "h": "Indicative, non-binding estimate",
+          "p": [
+            "Displayed amounts are estimates based on the information you enter. They do not replace your payslip, employment contract or collective agreement, and are not legal or HR advice. Only the payslip issued by your employer is authoritative.",
+            "Premiums (overtime, night, Sunday, public holidays) depend on your situation: check the rates you enter."
+          ]
+        },
+        {
+          "h": "Free version and Premium",
+          "p": [
+            "The free version can be used with no time limit. Premium is offered as an auto-renewing monthly or yearly subscription, or as a one-time purchase. The price is shown before purchase. Manage or cancel the subscription in your Apple or Google account settings at least 24 hours before the end of the current period. Any unused free trial is forfeited when a subscription is purchased. Refunds are handled by Apple or Google under their terms.",
+            "The “Restore purchases” button restores Premium on a new device using the same account."
+          ]
+        },
+        {
+          "h": "Your data",
+          "p": [
+            "Your data stays on your device. You are responsible for backing it up (Export). The publisher cannot recover lost data."
+          ]
+        },
+        {
+          "h": "Liability",
+          "p": [
+            "The app is provided as is. The publisher strives for accurate calculations but is not liable for differences between the estimate and the pay actually received."
+          ]
+        },
+        {
+          "h": "Governing law and contact",
+          "p": [
+            "These terms are governed by French law. Contact: {{EMAIL}}. Publisher: {{EDITOR}}. Last updated: {{UPDATED}}."
+          ]
+        }
+      ]
+    }
+  }
+}

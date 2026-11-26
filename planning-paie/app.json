@@ -1,0 +1,96 @@
+{
+  "expo": {
+    "name": "Planning Paie",
+    "slug": "planning-paie",
+    "scheme": "planningpaie",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#f4f5f8",
+    "platforms": ["ios", "android", "web"],
+    "ios": {
+      "bundleIdentifier": "fr.planningpaie.app",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleDevelopmentRegion": "fr"
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": []
+      }
+    },
+    "android": {
+      "package": "fr.planningpaie.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#2348C4",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO",
+        "com.google.android.gms.permission.AD_ID"
+      ],
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "single"
+    },
+    "locales": {
+      "fr": "./locales/fr.json",
+      "en": "./locales/en.json"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-localization",
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#2348C4",
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#0E1014"
+          }
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Planning Paie copie vos postes dans un calendrier « Planning Paie » de votre téléphone, pour les voir avec vos autres rendez-vous.",
+          "remindersPermission": "Planning Paie n'utilise pas vos rappels."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#2348C4",
+          "defaultChannel": "rappels-postes"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "privacyUrl": "https://planningpaie.github.io/privacy.html",
+      "termsUrl": "https://planningpaie.github.io/terms.html",
+      "eas": {}
+    }
+  }
+}
