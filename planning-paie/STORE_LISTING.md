@@ -39,6 +39,7 @@ VOTRE PAIE EN DIRECT
 • Brut à percevoir ce mois, net estimé, heures et jours travaillés, toujours visibles.
 • Numéros de semaine sur chaque ligne du calendrier.
 • Postes de nuit gérés (passage de minuit).
+• Plusieurs employeurs ou missions ? Le récap du mois donne les heures et le montant de chaque entreprise, puis le total.
 
 SIMPLE ET RESPECTUEUX
 • Aucune publicité, aucun compte, aucun suivi.
@@ -50,7 +51,7 @@ PREMIUM (facultatif)
 • Majorations de nuit, du dimanche et des jours fériés (fériés français calculés automatiquement).
 • Synchronisation avec le calendrier du téléphone.
 • Rappel avant chaque poste.
-• Feuille d'heures PDF et tableau pour Excel.
+• Feuille d'heures et récap par entreprise en PDF et pour Excel.
 Abonnement 1,99 €/mois ou 9,99 €/an (7 jours d'essai), ou achat unique 19,99 €. Résiliable à tout moment depuis votre compte Apple ou Google.
 
 Important : les montants sont des estimations indicatives et non contractuelles. Seule votre fiche de paie fait foi.
@@ -74,7 +75,7 @@ Fichiers prêts dans `store/screenshots/ios/` (1290 × 2796, iPhone 6,7 pouces) 
 | 3   | `3-poste-et-taux-horaire.png`  | Le taux horaire saisi avec le poste       |
 | 4   | `4-heures-sup-majorations.png` | Heures sup et majorations (Premium)       |
 | 5   | `5-theme-sombre.png`           | Thème sombre                              |
-| 6   | `6-sauvegarde-et-reglages.png` | Sauvegarde, export PDF et Excel           |
+| 6   | `6-recap-par-entreprise.png`   | Combien chaque entreprise vous doit       |
 
 Ces captures sont rendues à partir du code de l'application (version web, données de démonstration).
 Elles sont fidèles à l'écran, mais la police système peut légèrement différer : idéalement,
