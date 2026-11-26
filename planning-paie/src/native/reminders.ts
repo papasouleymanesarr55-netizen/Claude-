@@ -54,8 +54,9 @@ export async function rescheduleReminders(now = new Date()): Promise<number> {
   if (Platform.OS === 'web') return 0;
   const state = useAppStore.getState();
   await Notifications.cancelAllScheduledNotificationsAsync();
-  const minutes = state.settings.reminder;
-  if (!minutes || !selectPremium(state)) return 0;
+  const { reminder, reminderEve, reminderDay, reminderDayTime } = state.settings;
+  const any = reminder > 0 || reminderEve || reminderDay;
+  if (!any || !selectPremium(state)) return 0;
   const perm = await Notifications.getPermissionsAsync();
   if (!perm.granted) return 0;
   await ensureChannel();
@@ -63,22 +64,29 @@ export async function rescheduleReminders(now = new Date()): Promise<number> {
   const list = upcomingReminders(
     state.shifts,
     state.days,
-    minutes,
+    { before: reminder, eve: reminderEve, day: reminderDay, dayTime: reminderDayTime },
     now,
     MAX_SCHEDULED,
     t.day.customShift,
   );
-  for (const { occurrence, fireAt } of list) {
+  for (const { occurrence, fireAt, kind } of list) {
+    const hours = `${toHHMM(occurrence.day.start)}–${toHHMM(occurrence.day.end)}`;
+    const title =
+      kind === 'eve'
+        ? fill(t.calendarEvent.eveTitle, { name: occurrence.title, hours })
+        : kind === 'day'
+          ? fill(t.calendarEvent.dayTitle, { name: occurrence.title, hours })
+          : fill(t.calendarEvent.reminderTitle, {
+              name: occurrence.title,
+              delay: formatHours(reminder / 60, lang),
+            });
+    const body =
+      (kind === 'before'
+        ? fill(t.calendarEvent.reminderBody, { time: toHHMM(occurrence.day.start) })
+        : (occurrence.day.employer ?? '')) +
+      (occurrence.day.note ? ` · ${occurrence.day.note}` : '');
     await Notifications.scheduleNotificationAsync({
-      content: {
-        title: fill(t.calendarEvent.reminderTitle, {
-          name: occurrence.title,
-          delay: formatHours(minutes / 60, lang),
-        }),
-        body:
-          fill(t.calendarEvent.reminderBody, { time: toHHMM(occurrence.day.start) }) +
-          (occurrence.day.note ? ` · ${occurrence.day.note}` : ''),
-      },
+      content: { title, body: body.replace(/^ · /, '') },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: fireAt,

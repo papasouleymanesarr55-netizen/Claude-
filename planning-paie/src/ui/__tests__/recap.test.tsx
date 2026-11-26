@@ -5,6 +5,9 @@ import { initialState, useAppStore } from '../../store/store';
 import { recapCsv, recapHtml } from '../../native/exports';
 
 const mockPush = jest.fn();
+jest.mock('react-native-safe-area-context', () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
 jest.mock('expo-router', () => ({
   router: { push: (...a: unknown[]) => mockPush(...a), back: jest.fn() },
   useLocalSearchParams: () => ({ y: '2026', m: '10' }),
@@ -63,6 +66,25 @@ describe('écran Récap', () => {
     await fireEvent.press(screen.getByTestId('recap-prev'));
     expect(screen.getByTestId('recap-month')).toHaveTextContent('Octobre 2026');
     expect(screen.getByText('Aucun poste ce mois-ci.')).toBeTruthy();
+  });
+});
+
+describe('relevé / facture', () => {
+  it('est réservé à Premium', async () => {
+    await render(<RecapScreen />);
+    await fireEvent.press(screen.getByTestId('invoice-Alpha'));
+    expect(mockPush).toHaveBeenCalledWith('/premium');
+  });
+
+  it('ouvre la fiche et demande les coordonnées avant une facture', async () => {
+    useAppStore.getState().setSettings({ premium: true });
+    await render(<RecapScreen />);
+    await fireEvent.press(screen.getByTestId('invoice-Alpha'));
+    expect(screen.getByTestId('invoice-sheet')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Facture'));
+    expect(screen.getByTestId('invoice-number').props.value).toMatch(/^\d{4}-001$/);
+    expect(screen.getByTestId('invoice-complete-issuer')).toBeTruthy();
+    expect(screen.getByTestId('invoice-create').props.accessibilityState.disabled).toBe(true);
   });
 });
 

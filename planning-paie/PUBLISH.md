@@ -160,6 +160,43 @@ sur le test). Vérifiez sur place les conditions exactes, elles évoluent.
 - **Google** : après accès à la production, Production > Créer une version > « Envoyer pour examen ».
   Réponse en quelques jours.
 
+## Publicité vidéo (facultatif, désactivée par défaut)
+
+La version gratuite peut proposer une **vidéo à la demande** : l'utilisateur la regarde s'il le veut,
+et les exports PDF/Excel sont débloqués 24 h. Jamais de bannière, jamais de pub imposée, rien en Premium.
+Tant que vous ne faites pas les étapes ci-dessous, **le code publicitaire n'est même pas inclus**
+dans l'application.
+
+Je vous conseille d'attendre d'avoir quelques centaines d'utilisateurs : avant, cela rapporte
+quelques euros et alourdit la validation.
+
+1. Créez un compte **Google AdMob** (https://admob.google.com, gratuit) et liez-le à vos coordonnées
+   de paiement (Google paie à partir de 70 € de gains).
+2. Ajoutez deux applications (iOS et Android). Notez les deux **identifiants d'application**
+   (`ca-app-pub-…~…`).
+3. Pour chacune, créez un **bloc d'annonces « Avec récompense »** (récompense : 1). Notez les
+   deux **identifiants de bloc** (`ca-app-pub-…/…`).
+4. Dans AdMob > **Confidentialité et messages** : créez un message **RGPD** (Europe) pour les deux
+   applications et publiez-le. C'est ce formulaire de consentement que l'application affiche.
+5. Dans le terminal (tout sur une ligne par commande) :
+   ```
+   npx eas-cli@latest env:create --name EXPO_PUBLIC_ADS_ENABLED --value 1 --environment production --environment preview --visibility plaintext
+   npx eas-cli@latest env:create --name ADMOB_IOS_APP_ID --value ca-app-pub-XXX~YYY --environment production --environment preview --visibility plaintext
+   npx eas-cli@latest env:create --name ADMOB_ANDROID_APP_ID --value ca-app-pub-XXX~ZZZ --environment production --environment preview --visibility plaintext
+   npx eas-cli@latest env:create --name EXPO_PUBLIC_ADMOB_REWARDED_IOS --value ca-app-pub-XXX/AAA --environment production --environment preview --visibility plaintext
+   npx eas-cli@latest env:create --name EXPO_PUBLIC_ADMOB_REWARDED_ANDROID --value ca-app-pub-XXX/BBB --environment production --environment preview --visibility plaintext
+   ```
+6. Dans `src/legal/publisher.json`, passez `"adsEnabled"` à `true`, puis lancez
+   `node scripts/build-site.mjs` et republiez le dossier `site/` (étape 3) : la politique de
+   confidentialité décrit alors AdMob.
+7. Dans les stores, **mettez à jour les déclarations** (section « Si la publicité est activée » de
+   `STORE_LISTING.md`) **avant** d'envoyer le nouveau build.
+8. Refaites un build, testez sur téléphone (en mode test, des vidéos de démonstration Google
+   s'affichent), puis soumettez.
+
+Pour désactiver : supprimez la variable `EXPO_PUBLIC_ADS_ENABLED` (ou mettez `0`), remettez
+`adsEnabled` à `false`, refaites un build.
+
 ## Mises à jour suivantes
 
 ```
@@ -179,6 +216,8 @@ les numéros de build s'incrémentent tout seuls.
 - [x] Prix, durée et renouvellement affichés avant l'achat, liens confidentialité et conditions.
 - [x] Mention « estimation indicative, non contractuelle » (écran principal, PDF, conditions).
 - [x] Export et suppression des données (Réglages > Mes données).
+- [x] Publicité : désactivée par défaut ; si activée, uniquement à la demande, après consentement RGPD,
+      avec accès permanent au formulaire (Réglages > Confidentialité des publicités).
 - [x] Permissions demandées uniquement à l'activation, avec texte explicatif (calendrier, notifications).
 - [ ] Coordonnées de l'éditeur complétées (étape 2) et pages publiées (étape 3).
 - [ ] Achat testé en Sandbox sur un vrai téléphone (étape 8).

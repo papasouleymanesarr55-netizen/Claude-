@@ -9,7 +9,9 @@ import { parseDayKey, toHHMM } from '../domain/time';
 import { fill, useI18n } from '../i18n';
 import { exportRecapCsv, exportRecapPdf } from '../native/exports';
 import { useMonthSummary } from '../store/selectors';
-import { selectPremium, useAppStore } from '../store/store';
+import { selectExportsUnlocked, selectPremium, useAppStore } from '../store/store';
+import { InvoiceSheet } from '../ui/InvoiceSheet';
+import { useExportGate } from '../ui/UnlockSheet';
 import { capitalize } from '../ui/DaySheet';
 import { notify } from '../ui/dialogs';
 import { Button, Card, Divider, MIN_TOUCH } from '../ui/kit';
@@ -53,20 +55,17 @@ export default function RecapScreen() {
   const dayUnit = useDayUnit();
   const onlyUnnamed = recap.employers.length > 0 && recap.employers.every((e) => !e.employer);
 
-  const doExport = async (fn: (y: number, m: number) => Promise<void>) => {
-    if (!premium) {
-      router.push('/premium');
-      return;
-    }
-    setBusy(true);
-    try {
-      await fn(cursor.year, cursor.month0);
-    } catch {
-      notify(t.settings.exportError);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const gate = useExportGate();
+  const exportsUnlocked = useAppStore((s) => selectExportsUnlocked(s));
+  const [invoiceFor, setInvoiceFor] = useState<string | null>(null);
+
+  const doExport = (fn: (y: number, m: number) => Promise<void>) =>
+    gate.run(() => {
+      setBusy(true);
+      fn(cursor.year, cursor.month0)
+        .catch(() => notify(t.settings.exportError))
+        .finally(() => setBusy(false));
+    });
 
   return (
     <ScrollView
@@ -113,6 +112,8 @@ export default function RecapScreen() {
               recap={e}
               open={!!open[e.employer]}
               onToggle={() => setOpen((o) => ({ ...o, [e.employer]: !o[e.employer] }))}
+              locked={!premium}
+              onInvoice={() => (premium ? setInvoiceFor(e.employer) : router.push('/premium'))}
             />
           ))}
 
@@ -147,21 +148,30 @@ export default function RecapScreen() {
           <View style={styles.exports}>
             <Button
               testID="recap-pdf"
-              label={`${t.recap.exportPdf}${premium ? '' : '  🔒'}`}
-              onPress={() => void doExport(exportRecapPdf)}
+              label={`${t.recap.exportPdf}${exportsUnlocked ? '' : '  🔒'}`}
+              onPress={() => doExport(exportRecapPdf)}
               disabled={busy}
             />
             <Button
               testID="recap-csv"
-              label={`${t.recap.exportCsv}${premium ? '' : '  🔒'}`}
+              label={`${t.recap.exportCsv}${exportsUnlocked ? '' : '  🔒'}`}
               variant="secondary"
-              onPress={() => void doExport(exportRecapCsv)}
+              onPress={() => doExport(exportRecapCsv)}
               disabled={busy}
             />
           </View>
         </>
       )}
       {busy ? <ActivityIndicator color={theme.accent} style={{ marginTop: 12 }} /> : null}
+      {gate.sheet}
+      {invoiceFor !== null ? (
+        <InvoiceSheet
+          employer={invoiceFor}
+          year={cursor.year}
+          month0={cursor.month0}
+          onClose={() => setInvoiceFor(null)}
+        />
+      ) : null}
     </ScrollView>
   );
 }
@@ -175,10 +185,14 @@ function EmployerCard({
   recap: e,
   open,
   onToggle,
+  locked,
+  onInvoice,
 }: {
   recap: EmployerRecap;
   open: boolean;
   onToggle: () => void;
+  locked: boolean;
+  onInvoice: () => void;
 }) {
   const theme = useTheme();
   const { t, lang, locale } = useI18n();
@@ -218,16 +232,29 @@ function EmployerCard({
           </Text>
         </View>
       ))}
-      <Pressable
-        onPress={onToggle}
-        accessibilityRole="button"
-        accessibilityState={{ expanded: open }}
-        style={styles.toggle}
-      >
-        <Text style={{ color: theme.accent, fontWeight: '600' }}>
-          {open ? t.recap.hideDays : t.recap.showDays} ({e.days.length})
-        </Text>
-      </Pressable>
+      <View style={styles.actions}>
+        <Pressable
+          onPress={onToggle}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: open }}
+          style={styles.toggle}
+        >
+          <Text style={{ color: theme.accent, fontWeight: '600' }}>
+            {open ? t.recap.hideDays : t.recap.showDays} ({e.days.length})
+          </Text>
+        </Pressable>
+        <Pressable
+          testID={`invoice-${name}`}
+          onPress={onInvoice}
+          accessibilityRole="button"
+          style={[styles.invoiceBtn, { borderColor: theme.accent }]}
+        >
+          <Text style={{ color: theme.accent, fontWeight: '700' }}>
+            {t.invoice.button}
+            {locked ? '  🔒' : ''}
+          </Text>
+        </Pressable>
+      </View>
       {open
         ? e.days.map((d) => (
             <View key={d.day.key} style={styles.dayRow}>
@@ -269,6 +296,21 @@ const styles = StyleSheet.create({
   lineLabel: { fontSize: 15, flex: 1 },
   lineValue: { fontSize: 15, fontWeight: '600' },
   toggle: { minHeight: MIN_TOUCH, justifyContent: 'center' },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  invoiceBtn: {
+    minHeight: MIN_TOUCH,
+    paddingHorizontal: 14,
+    borderRadius: 22,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+  },
   dayRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 5, gap: 8 },
   dayDate: { width: 56, fontSize: 14, fontWeight: '600' },
   dayShift: { flex: 1, fontSize: 13 },

@@ -20,6 +20,7 @@ export async function exportJson(now = new Date()): Promise<void> {
       charges: s.settings.charges,
       lastRate: s.settings.lastRate,
       rules: s.rules,
+      billing: s.billing,
     },
     now,
   );

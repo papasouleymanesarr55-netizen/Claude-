@@ -1,5 +1,12 @@
 import { DEFAULT_RULES } from '../../domain/types';
-import { DEFAULT_SETTINGS, initialState, migrate, selectPremium, useAppStore } from '../store';
+import {
+  DEFAULT_SETTINGS,
+  initialState,
+  migrate,
+  selectExportsUnlocked,
+  selectPremium,
+  useAppStore,
+} from '../store';
 
 const names = { morning: 'Matin', evening: 'Soir', night: 'Nuit' };
 
@@ -69,6 +76,21 @@ describe('store', () => {
     expect(s.onboarded).toBe(true);
   });
 
+  it('débloque les exports 24 h après une vidéo', () => {
+    const now = Date.now();
+    expect(selectExportsUnlocked(useAppStore.getState(), now)).toBe(false);
+    useAppStore.getState().setSettings({ adPassUntil: now + 24 * 3600000 });
+    expect(selectExportsUnlocked(useAppStore.getState(), now)).toBe(true);
+    expect(selectExportsUnlocked(useAppStore.getState(), now + 25 * 3600000)).toBe(false);
+  });
+
+  it('numérote les factures sans trou', () => {
+    useAppStore.getState().recordInvoice(`${new Date().getFullYear()}-001`);
+    expect(useAppStore.getState().billing.counter.next).toBe(2);
+    useAppStore.getState().setClientAddress('Alpha', '1 rue X');
+    expect(useAppStore.getState().billing.clients.Alpha).toEqual({ address: '1 rue X' });
+  });
+
   it('active Premium simulé uniquement en développement', () => {
     useAppStore.getState().setSettings({ devPremium: true });
     expect(selectPremium(useAppStore.getState())).toBe(__DEV__);
@@ -90,6 +112,23 @@ describe('migrations', () => {
   });
   it('ne modifie pas un état déjà à jour', () => {
     const s = initialState();
-    expect(migrate(s, 1)).toBe(s);
+    expect(migrate(s, 2)).toBe(s);
+  });
+  it('passe de la version 1 à 2 sans perte (rappels, facturation)', () => {
+    const v1 = { ...initialState(), settings: { ...DEFAULT_SETTINGS, reminder: 60 } } as Record<
+      string,
+      unknown
+    >;
+    delete v1.billing;
+    const v1Settings = { ...(v1.settings as object) } as Record<string, unknown>;
+    delete v1Settings.reminderEve;
+    delete v1Settings.adPassUntil;
+    v1.settings = v1Settings;
+    const m = migrate(v1, 1);
+    expect(m.settings.reminder).toBe(60);
+    expect(m.settings.reminderEve).toBe(false);
+    expect(m.settings.adPassUntil).toBe(0);
+    expect(m.billing.issuer.vatMention).toBe('TVA non applicable, art. 293 B du CGI');
+    expect(m.billing.counter.next).toBe(1);
   });
 });

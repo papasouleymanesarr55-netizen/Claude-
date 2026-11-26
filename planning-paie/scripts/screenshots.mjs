@@ -51,7 +51,7 @@ const errors = [];
 
 async function shot(
   name,
-  { theme = 'light', premium = false, path = '/', act, state, rules } = {},
+  { theme = 'light', premium = false, path = '/', act, state, rules, fullPage = false } = {},
 ) {
   const ctx = await browser.newContext({
     viewport: { width: VIEW.width, height: VIEW.height },
@@ -72,7 +72,7 @@ async function shot(
   await page.waitForTimeout(1200);
   if (act) await act(page);
   await page.waitForTimeout(500);
-  await page.screenshot({ path: join(out, `${name}.png`) });
+  await page.screenshot({ path: join(out, `${name}.png`), fullPage });
   await ctx.close();
 }
 
@@ -120,6 +120,16 @@ await shot('06-premium', { path: '/premium' });
 await shot('07-calcul-avance', { path: '/rules', premium: true });
 await shot('08-bienvenue', { state: null });
 await shot('09-recap', { path: '/recap?y=2026&m=9' });
+await shot('11-facture', {
+  path: '/recap?y=2026&m=9',
+  premium: true,
+  act: async (p) => {
+    await p.getByTestId('invoice-Boulangerie Martin').click();
+    await p.getByText('Facture', { exact: true }).click();
+  },
+});
+await shot('12-reglages-complets', { path: '/settings', premium: true, fullPage: true });
+await shot('13-coordonnees', { path: '/billing', premium: true });
 await shot('10-recap-sombre', { path: '/recap?y=2026&m=9', theme: 'dark', premium: true });
 
 await browser.close();

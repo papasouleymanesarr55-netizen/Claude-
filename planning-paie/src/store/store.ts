@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import type { BackupData } from '../domain/backup';
+import { advanceCounter, defaultBilling, type Billing, type Issuer } from '../domain/invoice';
 import { newId } from '../domain/id';
 import { DEFAULT_RULES, SHIFT_COLORS } from '../domain/types';
 import type { DayEntry, DayKey, PayRules, Shift } from '../domain/types';
@@ -23,6 +24,14 @@ export interface Settings {
   premium: boolean;
   /** Premium simulé, utilisable uniquement en développement. */
   devPremium: boolean;
+  /** Rappel la veille, 24 h avant le début du poste (Premium). */
+  reminderEve: boolean;
+  /** Rappel le jour J, à l'heure choisie (Premium). */
+  reminderDay: boolean;
+  /** Heure du rappel du jour J, en minutes depuis minuit. */
+  reminderDayTime: number;
+  /** Exports débloqués par une vidéo jusqu'à cette date (ms), version gratuite. */
+  adPassUntil: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -34,6 +43,10 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
   premium: false,
   devPremium: false,
+  reminderEve: false,
+  reminderDay: false,
+  reminderDayTime: 7 * 60,
+  adPassUntil: 0,
 };
 
 export interface PersistedState {
@@ -44,6 +57,8 @@ export interface PersistedState {
   onboarded: boolean;
   /** Identifiant du calendrier « Planning Paie » créé sur le téléphone. */
   calendarId?: string;
+  /** Coordonnées de facturation, adresses des clients, numérotation. */
+  billing: Billing;
 }
 
 export interface AppState extends PersistedState {
@@ -59,6 +74,10 @@ export interface AppState extends PersistedState {
   setSettings(patch: Partial<Settings>): void;
   setRules(patch: Partial<PayRules>): void;
   setCalendarId(id: string | undefined): void;
+  setIssuer(patch: Partial<Issuer>): void;
+  setClientAddress(employer: string, address: string): void;
+  /** Enregistre l'émission d'une facture (fait avancer la numérotation). */
+  recordInvoice(number: string): void;
   completeOnboarding(
     rate: number,
     names: { morning: string; evening: string; night: string },
@@ -67,7 +86,7 @@ export interface AppState extends PersistedState {
   resetAll(): void;
 }
 
-export const STORE_VERSION = 1;
+export const STORE_VERSION = 2;
 export const STORAGE_KEY = 'planning-paie';
 
 export function initialState(): PersistedState {
@@ -77,6 +96,7 @@ export function initialState(): PersistedState {
     settings: { ...DEFAULT_SETTINGS },
     rules: structuredCloneRules(DEFAULT_RULES),
     onboarded: false,
+    billing: defaultBilling(),
   };
 }
 
@@ -100,6 +120,12 @@ const migrations: Record<number, (state: Record<string, unknown>) => Record<stri
     ...s,
     settings: { ...DEFAULT_SETTINGS, ...((s.settings as object | undefined) ?? {}) },
     rules: { ...structuredCloneRules(DEFAULT_RULES), ...((s.rules as object | undefined) ?? {}) },
+  }),
+  // v1 → v2 : rappels veille / jour J, déblocage par vidéo, facturation.
+  2: (s) => ({
+    ...s,
+    settings: { ...DEFAULT_SETTINGS, ...((s.settings as object | undefined) ?? {}) },
+    billing: (s.billing as Billing | undefined) ?? defaultBilling(),
   }),
 };
 
@@ -207,10 +233,27 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
+      setIssuer(patch) {
+        set((s) => ({ billing: { ...s.billing, issuer: { ...s.billing.issuer, ...patch } } }));
+      },
+
+      setClientAddress(employer, address) {
+        set((s) => ({
+          billing: { ...s.billing, clients: { ...s.billing.clients, [employer]: { address } } },
+        }));
+      },
+
+      recordInvoice(number) {
+        set((s) => ({
+          billing: { ...s.billing, counter: advanceCounter(s.billing.counter, number) },
+        }));
+      },
+
       replaceAll(data) {
         set((s) => ({
           shifts: data.shifts,
           days: data.days,
+          billing: data.billing ?? s.billing,
           onboarded: true,
           rules: data.rules ?? s.rules,
           settings: {
@@ -226,7 +269,11 @@ export const useAppStore = create<AppState>()(
         set({
           ...initialState(),
           // L'état d'achat ne dépend pas des données locales.
-          settings: { ...DEFAULT_SETTINGS, premium: settings.premium },
+          settings: {
+            ...DEFAULT_SETTINGS,
+            premium: settings.premium,
+            adPassUntil: settings.adPassUntil,
+          },
         });
       },
     }),
@@ -242,6 +289,7 @@ export const useAppStore = create<AppState>()(
         rules: s.rules,
         onboarded: s.onboarded,
         calendarId: s.calendarId,
+        billing: s.billing,
       }),
       onRehydrateStorage: () => () => {
         useAppStore.setState({ hydrated: true });
@@ -253,4 +301,9 @@ export const useAppStore = create<AppState>()(
 /** Premium effectif : achat confirmé, ou simulé en développement. */
 export function selectPremium(s: AppState): boolean {
   return s.settings.premium || (__DEV__ && s.settings.devPremium);
+}
+
+/** Exports PDF / Excel : Premium, ou débloqués 24 h par une vidéo (version gratuite). */
+export function selectExportsUnlocked(s: AppState, now = Date.now()): boolean {
+  return selectPremium(s) || s.settings.adPassUntil > now;
 }

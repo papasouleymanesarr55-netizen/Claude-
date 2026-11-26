@@ -62,6 +62,34 @@ Chaque choix ci-dessous a été fait sans vous demander, selon les défauts du b
 29. **Taux** : chaque entreprise garde le taux horaire de ses postes ; pas de taux « par entreprise »
     distinct, pour ne pas avoir deux endroits où saisir le même chiffre.
 
+## Publicité, factures et rappels (ajoutés à votre demande)
+
+30. **Publicité désactivée par défaut, et absente du code compilé** : le SDK Google n'est intégré
+    que si la variable `EXPO_PUBLIC_ADS_ENABLED=1` est définie au build (sinon il est exclu de
+    l'application, ce qui évite aussi un plantage au démarrage sans compte AdMob).
+31. **Format** : uniquement une **vidéo « avec récompense » à la demande**. Elle débloque **les exports
+    PDF/Excel pendant 24 h** (feuille d'heures, tableau, récap). Elle ne débloque pas la facture,
+    le calcul avancé, le calendrier ni les rappels, qui restent Premium. Aucune pub en Premium.
+32. **Consentement** : formulaire Google (UMP) affiché **au premier clic sur « Regarder une vidéo »**,
+    pas au lancement de l'application. Publicités **non personnalisées** si l'utilisateur refuse
+    (ou hors cadre TCF). Pas de demande de suivi Apple (ATT) : moins de revenus, mais pas de pop-up
+    supplémentaire et une étiquette « pas de suivi ». Le formulaire reste accessible dans
+    Réglages > Confidentialité des publicités.
+33. **Relevé ou facture** (Premium) : bouton sur chaque entreprise du Récap.
+    - _Relevé d'heures_ (salariés) : détail des jours, total des heures, brut estimé, cases de signature.
+    - _Facture_ (indépendants) : numéro `AAAA-001` continu (remis à 1 chaque année, modifiable),
+      date d'émission, période, échéance (30 jours par défaut), émetteur avec SIRET, client et adresse,
+      une ligne par poste et par taux, total HT, mention TVA (par défaut « TVA non applicable,
+      art. 293 B du CGI »), pénalités de retard et indemnité de 40 €. **La TVA n'est pas calculée** :
+      l'export convient aux micro-entrepreneurs en franchise, pas encore aux assujettis.
+    - Le numéro n'avance que lorsque la facture est réellement créée. L'adresse du client est mémorisée.
+34. **Rappels** (Premium) : en plus du rappel « X min avant », deux options cumulables :
+    **la veille** (exactement 24 h avant le début) et **le jour J** à une heure choisie (7 h par défaut ;
+    si le poste commence plus tôt, le rappel arrive 1 h avant le début). Les 60 rappels les plus proches
+    sont programmés, tous types confondus (limite iOS).
+35. **Données** : version 2 du stockage (migration automatique, sans perte). Les coordonnées de
+    facturation sont incluses dans la sauvegarde JSON.
+
 ## Publication et monétisation
 
 20. **Identifiant** : `fr.planningpaie.app` (iOS et Android). À changer **avant la première mise en ligne**

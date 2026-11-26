@@ -7,12 +7,21 @@
           "h": "En bref",
           "p": [
             "Planning Paie ne collecte aucune donnée personnelle. Pas de compte, pas de publicité, pas de mesure d’audience, pas de suivi. Vos plannings et vos montants restent sur votre téléphone."
-          ]
+          ],
+          "onlyWithoutAds": true
+        },
+        {
+          "h": "En bref",
+          "p": [
+            "Vos plannings, montants et factures restent sur votre téléphone : l’éditeur ne les reçoit jamais. Pas de compte, pas de mesure d’audience. La seule publicité est une vidéo facultative, que vous choisissez de regarder (voir « Publicité »)."
+          ],
+          "onlyWithAds": true
         },
         {
           "h": "Données stockées sur votre appareil",
           "p": [
             "Les postes, horaires, taux horaires, notes et réglages que vous saisissez sont enregistrés uniquement dans la mémoire de l’application, sur votre téléphone. Ils ne sont envoyés à aucun serveur de l’éditeur.",
+            "Vos coordonnées de facturation (nom, adresse, SIRET, IBAN) et les adresses de vos clients, si vous les saisissez pour créer des factures, sont elles aussi stockées uniquement sur votre téléphone.",
             "Vous pouvez les exporter à tout moment (Réglages > Exporter une sauvegarde) et les effacer (Réglages > Effacer toutes mes données). La désinstallation de l’application les supprime également."
           ]
         },
@@ -26,6 +35,15 @@
           "h": "Achats intégrés",
           "p": [
             "Les abonnements et l’achat Premium sont traités par Apple (App Store) ou Google (Google Play). L’éditeur ne reçoit jamais vos coordonnées bancaires. Pour vérifier vos droits Premium, l’application utilise le service RevenueCat, qui reçoit un identifiant anonyme généré par l’application et les informations d’achat transmises par le store, sans nom, e-mail ni données de planning. Politique de RevenueCat : https://www.revenuecat.com/privacy"
+          ]
+        },
+        {
+          "h": "Publicité (version gratuite)",
+          "onlyWithAds": true,
+          "p": [
+            "La version gratuite peut proposer, uniquement si vous le demandez, de regarder une courte vidéo publicitaire pour débloquer les exports pendant 24 heures. Aucune publicité n’est affichée sans action de votre part, ni dans la version Premium.",
+            "Avant la première vidéo, un formulaire de consentement (Google) vous permet d’accepter ou de refuser les publicités personnalisées. Le service Google AdMob reçoit alors des données techniques : adresse IP, modèle et système de l’appareil, interactions avec la publicité et, seulement si vous l’acceptez, un identifiant publicitaire. Vos plannings, montants et factures ne lui sont jamais transmis. Règles de Google : https://policies.google.com/technologies/partner-sites",
+            "Vous pouvez changer d’avis à tout moment : Réglages > Confidentialité des publicités."
           ]
         },
         {
@@ -73,6 +91,12 @@
           ]
         },
         {
+          "h": "Factures et relevés",
+          "p": [
+            "Les factures et relevés d’heures sont créés à partir de vos saisies. Vous restez responsable de leur exactitude, de leur numérotation et de leur conformité (notamment en matière de TVA : l’application ne calcule pas la TVA et convient aux micro-entrepreneurs en franchise en base)."
+          ]
+        },
+        {
           "h": "Vos données",
           "p": [
             "Vos données restent sur votre appareil. Vous êtes responsable de leur sauvegarde (fonction Exporter). L’éditeur ne peut pas récupérer des données perdues."
@@ -101,12 +125,21 @@
           "h": "In short",
           "p": [
             "Planning Paie collects no personal data. No account, no ads, no analytics, no tracking. Your schedules and amounts stay on your phone."
-          ]
+          ],
+          "onlyWithoutAds": true
+        },
+        {
+          "h": "In short",
+          "p": [
+            "Your schedules, amounts and invoices stay on your phone: the publisher never receives them. No account, no analytics. The only advertising is an optional video that you choose to watch (see “Advertising”)."
+          ],
+          "onlyWithAds": true
         },
         {
           "h": "Data stored on your device",
           "p": [
             "Shifts, times, hourly rates, notes and settings you enter are stored only inside the app on your phone. They are never sent to the publisher’s servers.",
+            "Your invoicing details (name, address, company number, IBAN) and your clients’ addresses, if you enter them to create invoices, are also stored only on your phone.",
             "You can export them at any time (Settings > Export a backup) and erase them (Settings > Erase all my data). Uninstalling the app also deletes them."
           ]
         },
@@ -120,6 +153,15 @@
           "h": "In-app purchases",
           "p": [
             "Subscriptions and the Premium purchase are processed by Apple (App Store) or Google (Google Play). The publisher never receives your payment details. To check Premium access, the app uses RevenueCat, which receives an anonymous identifier generated by the app and the purchase information sent by the store, with no name, email or schedule data. RevenueCat privacy policy: https://www.revenuecat.com/privacy"
+          ]
+        },
+        {
+          "h": "Advertising (free version)",
+          "onlyWithAds": true,
+          "p": [
+            "The free version may offer, only when you ask, to watch a short video ad to unlock exports for 24 hours. No ad is shown without your action, and none in Premium.",
+            "Before the first video, a consent form (Google) lets you accept or refuse personalised ads. Google AdMob then receives technical data: IP address, device model and system, ad interactions and, only if you accept, an advertising identifier. Your schedules, amounts and invoices are never sent to it. Google’s policy: https://policies.google.com/technologies/partner-sites",
+            "You can change your mind at any time: Settings > Ad privacy."
           ]
         },
         {
@@ -162,6 +204,12 @@
           "p": [
             "The free version can be used with no time limit. Premium is offered as an auto-renewing monthly or yearly subscription, or as a one-time purchase. The price is shown before purchase. Manage or cancel the subscription in your Apple or Google account settings at least 24 hours before the end of the current period. Any unused free trial is forfeited when a subscription is purchased. Refunds are handled by Apple or Google under their terms.",
             "The “Restore purchases” button restores Premium on a new device using the same account."
+          ]
+        },
+        {
+          "h": "Invoices and timesheets",
+          "p": [
+            "Invoices and timesheets are created from what you enter. You remain responsible for their accuracy, numbering and compliance (in particular VAT: the app does not calculate VAT and suits French micro-entrepreneurs exempt from VAT)."
           ]
         },
         {

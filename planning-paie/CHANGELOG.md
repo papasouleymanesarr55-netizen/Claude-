@@ -13,4 +13,7 @@
   français, synchronisation calendrier, rappels, feuille d'heures PDF et tableau CSV.
 - Récap du mois par entreprise / mission : heures, jours, brut et net de chaque entreprise,
   puis total général ; export PDF et Excel (Premium).
-- Aucune publicité, aucun compte, aucun suivi.
+- Relevé d'heures à signer ou facture par client depuis le Récap (Premium).
+- Rappels la veille (24 h avant) et le jour J, en plus du rappel avant le poste (Premium).
+- Version gratuite : vidéo facultative pour débloquer les exports 24 h (désactivée par défaut).
+- Aucune publicité imposée, aucun compte, aucun suivi.

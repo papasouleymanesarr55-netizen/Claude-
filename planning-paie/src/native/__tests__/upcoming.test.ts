@@ -40,9 +40,61 @@ describe('postes à venir', () => {
         days[`2026-${m}-${String(i).padStart(2, '0')}`] = { shiftId: 'm' };
     }
     const now = new Date(2026, 9, 10, 7, 45); // 10 oct. 7 h 45
-    const list = upcomingReminders([morning], days, 30, now, 60);
+    const list = upcomingReminders(
+      [morning],
+      days,
+      { before: 30, eve: false, day: false, dayTime: 420 },
+      now,
+      60,
+    );
     expect(list).toHaveLength(60);
     // Le rappel du 10 oct. (7 h 30) est passé : le premier est le 11 oct. à 7 h 30.
     expect(list[0]!.fireAt).toEqual(new Date(2026, 9, 11, 7, 30));
+  });
+});
+
+describe('rappels la veille et le jour J', () => {
+  const days = { '2026-10-12': { shiftId: 'm' }, '2026-10-13': { shiftId: 'n' } };
+  const now = new Date(2026, 9, 10, 12, 0);
+
+  it('programme la veille (24 h avant) et le jour J à l’heure choisie, dans l’ordre', () => {
+    const list = upcomingReminders(
+      [morning, night],
+      days,
+      { before: 60, eve: true, day: true, dayTime: 7 * 60 },
+      now,
+    );
+    expect(list.map((r) => [r.kind, r.fireAt])).toEqual([
+      ['eve', new Date(2026, 9, 11, 8, 0)], // Matin du 12 à 8 h
+      ['day', new Date(2026, 9, 12, 7, 0)],
+      ['before', new Date(2026, 9, 12, 7, 0)],
+      ['eve', new Date(2026, 9, 12, 22, 0)], // Nuit du 13 à 22 h
+      ['day', new Date(2026, 9, 13, 7, 0)],
+      ['before', new Date(2026, 9, 13, 21, 0)],
+    ]);
+  });
+
+  it('avance le rappel du jour J si le poste commence avant l’heure choisie', () => {
+    const early: Shift = { ...morning, id: 'e', start: 5 * 60, end: 12 * 60 };
+    const list = upcomingReminders(
+      [early],
+      { '2026-10-12': { shiftId: 'e' } },
+      { before: 0, eve: false, day: true, dayTime: 7 * 60 },
+      now,
+    );
+    expect(list).toHaveLength(1);
+    expect(list[0]!.fireAt).toEqual(new Date(2026, 9, 12, 4, 0));
+  });
+
+  it('ignore les rappels déjà passés et respecte la limite', () => {
+    const list = upcomingReminders(
+      [morning],
+      { '2026-10-11': { shiftId: 'm' } },
+      { before: 30, eve: true, day: true, dayTime: 7 * 60 },
+      new Date(2026, 9, 10, 9, 0),
+      2,
+    );
+    // La veille (10 oct. 8 h) est passée ; restent jour J 7 h et 7 h 30.
+    expect(list.map((r) => r.kind)).toEqual(['day', 'before']);
   });
 });

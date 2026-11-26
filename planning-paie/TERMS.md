@@ -18,6 +18,10 @@ La version gratuite est utilisable sans limite de durée. Premium est proposé e
 
 Le bouton « Restaurer mes achats » permet de retrouver Premium sur un nouvel appareil utilisant le même compte.
 
+## Factures et relevés
+
+Les factures et relevés d’heures sont créés à partir de vos saisies. Vous restez responsable de leur exactitude, de leur numérotation et de leur conformité (notamment en matière de TVA : l’application ne calcule pas la TVA et convient aux micro-entrepreneurs en franchise en base).
+
 ## Vos données
 
 Vos données restent sur votre appareil. Vous êtes responsable de leur sauvegarde (fonction Exporter). L’éditeur ne peut pas récupérer des données perdues.
@@ -49,6 +53,10 @@ Premiums (overtime, night, Sunday, public holidays) depend on your situation: ch
 The free version can be used with no time limit. Premium is offered as an auto-renewing monthly or yearly subscription, or as a one-time purchase. The price is shown before purchase. Manage or cancel the subscription in your Apple or Google account settings at least 24 hours before the end of the current period. Any unused free trial is forfeited when a subscription is purchased. Refunds are handled by Apple or Google under their terms.
 
 The “Restore purchases” button restores Premium on a new device using the same account.
+
+## Invoices and timesheets
+
+Invoices and timesheets are created from what you enter. You remain responsible for their accuracy, numbering and compliance (in particular VAT: the app does not calculate VAT and suits French micro-entrepreneurs exempt from VAT).
 
 ## Your data
 

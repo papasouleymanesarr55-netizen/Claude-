@@ -1,4 +1,5 @@
 import { isDayKey, parseHHMM, toHHMM } from './time';
+import { defaultBilling, type Billing } from './invoice';
 import { DEFAULT_RULES, SHIFT_COLORS } from './types';
 import type { DayEntry, DayKey, PayRules, Shift } from './types';
 
@@ -32,6 +33,7 @@ export interface BackupFile {
   net: number;
   rate: number;
   rules?: PayRules;
+  billing?: Billing;
 }
 
 export interface BackupData {
@@ -40,10 +42,11 @@ export interface BackupData {
   charges?: number;
   lastRate?: number;
   rules?: PayRules;
+  billing?: Billing;
 }
 
 export function exportBackup(
-  data: Required<Omit<BackupData, 'rules'>> & { rules: PayRules },
+  data: Required<Omit<BackupData, 'rules' | 'billing'>> & { rules: PayRules; billing?: Billing },
   now = new Date(),
 ): BackupFile {
   const days: BackupFile['days'] = {};
@@ -77,6 +80,7 @@ export function exportBackup(
     net: data.charges,
     rate: data.lastRate,
     rules: data.rules,
+    ...(data.billing ? { billing: data.billing } : {}),
   };
 }
 
@@ -130,6 +134,41 @@ function parseRules(v: unknown): PayRules | undefined {
       ? v.extraHolidays.filter((k): k is string => typeof k === 'string' && isDayKey(k))
       : [],
     stacking: v.stacking === 'sum' ? 'sum' : 'max',
+  };
+}
+
+function str(v: unknown, max: number): string {
+  return typeof v === 'string' ? v.slice(0, max) : '';
+}
+
+function parseBilling(v: unknown): Billing | undefined {
+  if (!isObject(v)) return undefined;
+  const d = defaultBilling();
+  const i = isObject(v.issuer) ? v.issuer : {};
+  const clients: Billing['clients'] = {};
+  if (isObject(v.clients)) {
+    for (const [name, c] of Object.entries(v.clients)) {
+      if (isObject(c)) clients[name.slice(0, 40)] = { address: str(c.address, 300) };
+    }
+  }
+  const counter = isObject(v.counter) ? v.counter : {};
+  return {
+    issuer: {
+      name: str(i.name, 80),
+      address: str(i.address, 300),
+      siret: str(i.siret, 20),
+      email: str(i.email, 120),
+      phone: str(i.phone, 30),
+      vatMention:
+        typeof i.vatMention === 'string' ? i.vatMention.slice(0, 120) : d.issuer.vatMention,
+      paymentDays: num(i.paymentDays, 0, 120) ?? d.issuer.paymentDays,
+      iban: str(i.iban, 40),
+    },
+    clients,
+    counter: {
+      year: num(counter.year, 2000, 2200) ?? d.counter.year,
+      next: num(counter.next, 1, 100000) ?? d.counter.next,
+    },
   };
 }
 
@@ -216,5 +255,7 @@ export function parseBackup(text: string): ImportResult {
   if (lastRate !== undefined) data.lastRate = lastRate;
   const rules = parseRules(raw.rules);
   if (rules) data.rules = rules;
+  const billing = parseBilling(raw.billing);
+  if (billing) data.billing = billing;
   return { ok: true, data, skippedDays: skipped };
 }

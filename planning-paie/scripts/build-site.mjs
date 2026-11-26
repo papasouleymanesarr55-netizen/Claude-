@@ -32,11 +32,15 @@ ${body}
 `;
 }
 
+// Sections « publicité » : incluses seulement si adsEnabled vaut true dans publisher.json.
+const keep = (s) => (pub.adsEnabled ? !s.onlyWithoutAds : !s.onlyWithAds);
+
 function doc(lang, key) {
   const d = legal[lang][key];
   const body =
     `<h1>${esc(d.title)}</h1>` +
     d.sections
+      .filter(keep)
       .map((s) => `<h2>${esc(s.h)}</h2>${s.p.map((p) => `<p>${link(fill(p))}</p>`).join('')}`)
       .join('');
   return page(lang, d.title, body);
@@ -64,7 +68,10 @@ await writeFile('site/.nojekyll', '');
 
 const md = (lang, key) => {
   const d = legal[lang][key];
-  return `# ${d.title}\n\n${d.sections.map((s) => `## ${s.h}\n\n${s.p.map(fill).join('\n\n')}`).join('\n\n')}\n`;
+  return `# ${d.title}\n\n${d.sections
+    .filter(keep)
+    .map((s) => `## ${s.h}\n\n${s.p.map(fill).join('\n\n')}`)
+    .join('\n\n')}\n`;
 };
 await writeFile(
   'PRIVACY.md',

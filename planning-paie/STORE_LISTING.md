@@ -52,6 +52,8 @@ PREMIUM (facultatif)
 • Synchronisation avec le calendrier du téléphone.
 • Rappel avant chaque poste.
 • Feuille d'heures et récap par entreprise en PDF et pour Excel.
+• Relevé d'heures à faire signer ou facture par client (numérotation, mentions légales).
+• Rappels la veille, le jour J et avant chaque poste.
 Abonnement 1,99 €/mois ou 9,99 €/an (7 jours d'essai), ou achat unique 19,99 €. Résiliable à tout moment depuis votre compte Apple ou Google.
 
 Important : les montants sont des estimations indicatives et non contractuelles. Seule votre fiche de paie fait foi.
@@ -104,6 +106,24 @@ celles-ci si vous cochez l'option de mise à l'échelle ; sinon, capturez-les su
 - Publicité : **Non**. Identifiant publicitaire : **Non** (permission AD_ID bloquée).
 - Public cible : **18 ans et plus** (application destinée aux salariés).
 - Appli d'actualités / santé / finance réglementée : **Non**.
+
+## Si la publicité est activée (facultatif, voir PUBLISH.md)
+
+À modifier **avant** d'envoyer un build avec la publicité :
+
+- **Apple — Confidentialité de l'app** : ajoutez, en plus de l'historique d'achat :
+  - **Identifiants > Identifiant de l'appareil** : Publicité tierce, non lié à l'identité, **pas de suivi**
+    (l'application ne demande pas l'autorisation de suivi d'Apple).
+  - **Données d'utilisation > Interaction avec le produit** et **Données publicitaires** :
+    Publicité tierce, non liées à l'identité, pas de suivi.
+  - **Diagnostics > Données de plantage / performances** : Publicité tierce (collectées par le SDK Google).
+- **Google — Sécurité des données** : ajoutez **Identifiants de l'appareil ou autres** (publicité,
+  partagés avec Google), **Activité dans l'appli > Interactions** (publicité, analyse) et
+  **Infos et performances de l'appli > Plantages / diagnostics**. Collecte facultative pour l'utilisateur :
+  **oui** (il choisit de regarder la vidéo et donne son consentement).
+- **Google — « Votre application contient-elle des annonces ? »** : **Oui**.
+- Description : remplacez « Aucune publicité » par
+  « Aucune publicité imposée : une vidéo facultative permet de débloquer les exports gratuitement. »
 
 ## Note pour la vérification Apple (App Review)
 

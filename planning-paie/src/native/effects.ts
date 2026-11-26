@@ -10,7 +10,16 @@ const REMINDER_DELAY = 1500;
 const CALENDAR_DELAY = 4000;
 
 function relevant(s: Store) {
-  return [s.shifts, s.days, s.settings.reminder, s.settings.syncCal, selectPremium(s)] as const;
+  return [
+    s.shifts,
+    s.days,
+    s.settings.reminder,
+    s.settings.reminderEve,
+    s.settings.reminderDay,
+    s.settings.reminderDayTime,
+    s.settings.syncCal,
+    selectPremium(s),
+  ] as const;
 }
 
 /**

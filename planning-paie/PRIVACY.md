@@ -10,6 +10,8 @@ Planning Paie ne collecte aucune donnée personnelle. Pas de compte, pas de publ
 
 Les postes, horaires, taux horaires, notes et réglages que vous saisissez sont enregistrés uniquement dans la mémoire de l’application, sur votre téléphone. Ils ne sont envoyés à aucun serveur de l’éditeur.
 
+Vos coordonnées de facturation (nom, adresse, SIRET, IBAN) et les adresses de vos clients, si vous les saisissez pour créer des factures, sont elles aussi stockées uniquement sur votre téléphone.
+
 Vous pouvez les exporter à tout moment (Réglages > Exporter une sauvegarde) et les effacer (Réglages > Effacer toutes mes données). La désinstallation de l’application les supprime également.
 
 ## Calendrier et notifications (facultatif)
@@ -45,6 +47,8 @@ Planning Paie collects no personal data. No account, no ads, no analytics, no tr
 ## Data stored on your device
 
 Shifts, times, hourly rates, notes and settings you enter are stored only inside the app on your phone. They are never sent to the publisher’s servers.
+
+Your invoicing details (name, address, company number, IBAN) and your clients’ addresses, if you enter them to create invoices, are also stored only on your phone.
 
 You can export them at any time (Settings > Export a backup) and erase them (Settings > Erase all my data). Uninstalling the app also deletes them.
 

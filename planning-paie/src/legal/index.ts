@@ -1,4 +1,5 @@
 import type { Lang } from '../domain/format';
+import { ADS_BUILD_ENABLED } from '../native/ads';
 import legal from './legal.json';
 import publisher from './publisher.json';
 
@@ -16,10 +17,25 @@ export function fillPublisher(s: string): string {
     .replace(/\{\{UPDATED\}\}/g, publisher.updated);
 }
 
-export function legalText(lang: Lang, doc: LegalDoc): LegalText {
+interface RawSection {
+  h: string;
+  p: string[];
+  onlyWithAds?: boolean;
+  onlyWithoutAds?: boolean;
+}
+
+/** Garde les sections qui correspondent à l'état de la publicité. */
+export function sectionsFor(sections: RawSection[], adsEnabled: boolean): RawSection[] {
+  return sections.filter((s) => (adsEnabled ? !s.onlyWithoutAds : !s.onlyWithAds));
+}
+
+export function legalText(lang: Lang, doc: LegalDoc, adsEnabled = ADS_BUILD_ENABLED): LegalText {
   const src = legal[lang][doc];
   return {
     title: src.title,
-    sections: src.sections.map((s) => ({ h: s.h, p: s.p.map(fillPublisher) })),
+    sections: sectionsFor(src.sections as RawSection[], adsEnabled).map((s) => ({
+      h: s.h,
+      p: s.p.map(fillPublisher),
+    })),
   };
 }

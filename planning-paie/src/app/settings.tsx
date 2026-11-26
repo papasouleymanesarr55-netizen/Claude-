@@ -11,19 +11,51 @@ import { pickTextFile } from '../native/files';
 import { isSimulated, restore } from '../native/purchases';
 import { requestReminderPermission, rescheduleReminders } from '../native/reminders';
 import {
+  selectExportsUnlocked,
   selectPremium,
   useAppStore,
   type ReminderSetting,
   type ThemeSetting,
 } from '../store/store';
+import { useExportGate } from '../ui/UnlockSheet';
+import { adsAvailable, openAdPrivacyOptions } from '../native/ads';
+import { normalizeTimeInput, toHHMM } from '../domain/time';
 import { ChargesControl } from '../ui/ChargesSheet';
 import { confirmAsync, notify } from '../ui/dialogs';
-import { Card, Divider, Row, SectionTitle, Segmented, SwitchRow } from '../ui/kit';
+import { Card, Divider, Field, Row, SectionTitle, Segmented, SwitchRow, useDraft } from '../ui/kit';
 import { useTheme } from '../ui/theme';
+
+function DayTimeField({
+  label,
+  value,
+  onCommit,
+}: {
+  label: string;
+  value: number;
+  onCommit: (v: number) => void;
+}) {
+  const { text, setText, reset } = useDraft(value, toHHMM);
+  const parsed = normalizeTimeInput(text);
+  return (
+    <Field
+      testID="reminder-day-time"
+      label={label}
+      value={text}
+      onChangeText={setText}
+      error={parsed === null}
+      maxLength={5}
+      selectTextOnFocus
+      onBlur={() => {
+        if (parsed !== null) onCommit(parsed);
+        reset();
+      }}
+    />
+  );
+}
 
 export default function SettingsScreen() {
   const theme = useTheme();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const settings = useAppStore((s) => s.settings);
   const premium = useAppStore(selectPremium);
   const rulesEnabled = useAppStore((s) => s.rules.enabled);
@@ -34,12 +66,22 @@ export default function SettingsScreen() {
   const year = now.getFullYear();
   const month0 = now.getMonth();
 
-  const requirePremium = (fn: () => void | Promise<void>) => () => {
-    if (!premium) {
-      router.push('/premium');
+  const gate = useExportGate();
+  const exportsUnlocked = useAppStore((s) => selectExportsUnlocked(s));
+  const adPassUntil = settings.adPassUntil;
+  // Instant d'ouverture de l'écran (suffisant pour afficher l'échéance du déblocage).
+  const [openedAt] = useState(() => Date.now());
+  const passActive = !premium && adPassUntil > openedAt;
+
+  const setReminderFlag = async (patch: Partial<typeof settings>) => {
+    if (!premium) return router.push('/premium');
+    const turningOn = Object.values(patch).some((v) => v === true);
+    if (turningOn && !(await requestReminderPermission())) {
+      notify(t.settings.reminderDenied);
       return;
     }
-    void fn();
+    setSettings(patch);
+    void rescheduleReminders().catch(() => undefined);
   };
 
   const run = async (fn: () => Promise<void>, errorMessage: string) => {
@@ -190,6 +232,33 @@ export default function SettingsScreen() {
                 { value: 120, label: t.settings.reminder120 },
               ]}
             />
+            <Divider />
+            <SwitchRow
+              testID="reminder-eve"
+              label={t.settings.reminderEve}
+              value={premium && settings.reminderEve}
+              onChange={(reminderEve) => void setReminderFlag({ reminderEve })}
+              locked={!premium}
+            />
+            <Divider />
+            <SwitchRow
+              testID="reminder-day"
+              label={t.settings.reminderDay}
+              detail={t.settings.reminderDayHelp}
+              value={premium && settings.reminderDay}
+              onChange={(reminderDay) => void setReminderFlag({ reminderDay })}
+              locked={!premium}
+            />
+            {premium && settings.reminderDay ? (
+              <DayTimeField
+                label={t.settings.reminderDayTime}
+                value={settings.reminderDayTime}
+                onCommit={(reminderDayTime) => {
+                  setSettings({ reminderDayTime });
+                  void rescheduleReminders().catch(() => undefined);
+                }}
+              />
+            ) : null}
           </Card>
         </>
       ) : null}
@@ -213,17 +282,43 @@ export default function SettingsScreen() {
         <Divider />
         <Row
           label={t.settings.exportPdf}
-          locked={!premium}
-          onPress={requirePremium(() => run(() => exportPdf(year, month0), t.settings.exportError))}
+          locked={!exportsUnlocked}
+          onPress={() =>
+            gate.run(() => void run(() => exportPdf(year, month0), t.settings.exportError))
+          }
         />
         <Divider />
         <Row
           label={t.settings.exportCsv}
-          locked={!premium}
-          onPress={requirePremium(() => run(() => exportCsv(year, month0), t.settings.exportError))}
+          locked={!exportsUnlocked}
+          onPress={() =>
+            gate.run(() => void run(() => exportCsv(year, month0), t.settings.exportError))
+          }
         />
+        {passActive ? (
+          <Text style={[styles.pass, { color: theme.success }]}>
+            {fill(t.ads.unlockedUntil, {
+              time: new Date(adPassUntil).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-GB', {
+                weekday: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+              }),
+            })}
+          </Text>
+        ) : null}
         <Divider />
         <Row label={t.settings.reset} danger onPress={() => void resetAll()} />
+      </Card>
+
+      <SectionTitle>{t.settings.billing}</SectionTitle>
+      <Card>
+        <Row
+          testID="open-billing"
+          label={t.settings.issuer}
+          detail={t.settings.issuerHelp}
+          locked={!premium}
+          onPress={() => router.push(premium ? '/billing' : '/premium')}
+        />
       </Card>
 
       <SectionTitle>{t.settings.appearance}</SectionTitle>
@@ -290,11 +385,22 @@ export default function SettingsScreen() {
           label={t.settings.terms}
           onPress={() => router.push({ pathname: '/legal', params: { doc: 'terms' } })}
         />
+        {adsAvailable() ? (
+          <>
+            <Divider />
+            <Row
+              testID="ads-privacy"
+              label={t.settings.adsPrivacy}
+              onPress={() => void openAdPrivacyOptions().catch(() => undefined)}
+            />
+          </>
+        ) : null}
         <Divider />
         <Row label={fill(t.settings.version, { version: APP_VERSION })} />
       </Card>
       <Text style={[styles.disclaimer, { color: theme.textMuted }]}>{t.settings.disclaimer}</Text>
 
+      {gate.sheet}
       {busy ? (
         <View style={styles.busy} pointerEvents="none">
           <ActivityIndicator size="large" color={theme.accent} />
@@ -308,6 +414,7 @@ const styles = StyleSheet.create({
   content: { padding: 14, paddingBottom: 48, maxWidth: 720, width: '100%', alignSelf: 'center' },
   pad: { paddingVertical: 12 },
   gap: { marginTop: 10 },
+  pass: { fontSize: 13, paddingBottom: 10 },
   disclaimer: { fontSize: 12, marginTop: 16, lineHeight: 17, textAlign: 'center' },
   busy: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
 });
