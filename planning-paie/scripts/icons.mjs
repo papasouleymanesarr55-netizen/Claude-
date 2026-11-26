@@ -29,14 +29,36 @@ function symbol(fg, accent) {
 
 const files = [
   // iOS / icône générale : fond plein, sans transparence.
-  { name: 'icon.png', size: 1024, svg: `<rect width="1024" height="1024" fill="${BLUE}"/>${symbol('#FFFFFF', '#F5B700')}` },
+  {
+    name: 'icon.png',
+    size: 1024,
+    svg: `<rect width="1024" height="1024" fill="${BLUE}"/>${symbol('#FFFFFF', '#F5B700')}`,
+  },
   // Android adaptatif : premier plan transparent, symbole réduit dans la zone sûre (66 %).
-  { name: 'android-icon-foreground.png', size: 1024, transparent: true, svg: `<g transform="translate(512 512) scale(0.62) translate(-512 -512)">${symbol('#FFFFFF', '#F5B700')}</g>` },
-  { name: 'android-icon-monochrome.png', size: 1024, transparent: true, svg: `<g transform="translate(512 512) scale(0.62) translate(-512 -512)">${symbol('#FFFFFF', '#FFFFFF')}</g>` },
-  { name: 'android-icon-background.png', size: 1024, svg: `<rect width="1024" height="1024" fill="${BLUE}"/>` },
+  {
+    name: 'android-icon-foreground.png',
+    size: 1024,
+    transparent: true,
+    svg: `<g transform="translate(512 512) scale(0.62) translate(-512 -512)">${symbol('#FFFFFF', '#F5B700')}</g>`,
+  },
+  {
+    name: 'android-icon-monochrome.png',
+    size: 1024,
+    transparent: true,
+    svg: `<g transform="translate(512 512) scale(0.62) translate(-512 -512)">${symbol('#FFFFFF', '#FFFFFF')}</g>`,
+  },
+  {
+    name: 'android-icon-background.png',
+    size: 1024,
+    svg: `<rect width="1024" height="1024" fill="${BLUE}"/>`,
+  },
   // Écran de lancement : symbole blanc sur fond transparent (fond bleu défini dans app.json).
   { name: 'splash-icon.png', size: 1024, transparent: true, svg: symbol('#FFFFFF', '#F5B700') },
-  { name: 'favicon.png', size: 48, svg: `<rect width="1024" height="1024" rx="200" fill="${BLUE}"/>${symbol('#FFFFFF', '#F5B700')}` },
+  {
+    name: 'favicon.png',
+    size: 48,
+    svg: `<rect width="1024" height="1024" rx="200" fill="${BLUE}"/>${symbol('#FFFFFF', '#F5B700')}`,
+  },
 ];
 
 const browser = await chromium.launch();

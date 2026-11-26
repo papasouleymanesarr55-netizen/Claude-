@@ -7,6 +7,7 @@ import { initialState, useAppStore } from '../../store/store';
 jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn() } }));
 jest.mock(
   'react-native-safe-area-context',
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   () => require('react-native-safe-area-context/jest/mock').default,
 );
 jest.mock('expo-haptics', () => ({ selectionAsync: jest.fn(() => Promise.resolve()) }));

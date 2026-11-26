@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Planning Paie — Planning Paie</title>
+    <style>
+      :root {
+        --bg: #f4f5f8;
+        --fg: #16181d;
+        --muted: #555b66;
+        --accent: #2348c4;
+        --card: #fff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0e1014;
+          --fg: #f2f3f5;
+          --muted: #aab0bc;
+          --accent: #8fa8ff;
+          --card: #1a1d23;
+        }
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font:
+          16px/1.55 -apple-system,
+          system-ui,
+          Segoe UI,
+          Roboto,
+          sans-serif;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 32px 16px 64px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0 0 8px;
+      }
+      h2 {
+        font-size: 19px;
+        margin: 28px 0 6px;
+      }
+      a {
+        color: var(--accent);
+      }
+      nav {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+        font-size: 15px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-top: 16px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="index.html">Planning Paie</a><a href="privacy.html">Confidentialité</a
+        ><a href="terms.html">Conditions</a><a href="privacy-en.html">Privacy (EN)</a
+        ><a href="terms-en.html">Terms (EN)</a>
+      </nav>
+      <h1>Planning Paie</h1>
+      <p>
+        Le planning de vos postes et l’estimation de votre paie du mois, sans publicité et sans
+        collecte de données.
+      </p>
+      <div class="card">
+        <p>
+          <strong>Saisie rapide :</strong> touchez un poste, le jour suivant est sélectionné.
+          Double-touchez un jour pour le modifier.
+        </p>
+        <p>
+          <strong>Paie :</strong> taux horaire brut, brut du mois, net estimé, numéros de semaine.
+        </p>
+        <p class="muted">
+          Estimation indicative, non contractuelle. Seule votre fiche de paie fait foi.
+        </p>
+      </div>
+      <p>Contact : [adresse e-mail de contact à compléter]</p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+name: Planning Paie
+
+on:
+  push:
+    paths: ['planning-paie/**', '.github/workflows/planning-paie.yml']
+  pull_request:
+    paths: ['planning-paie/**', '.github/workflows/planning-paie.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: planning-paie
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: planning-paie/package-lock.json
+      - run: npm ci
+      - run: npm run verify
+      - name: Export web (vérifie que l'application se compile)
+        run: npx expo export --platform web --output-dir dist

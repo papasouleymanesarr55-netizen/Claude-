@@ -34,7 +34,7 @@ for (const [d, s] of Object.entries(plan)) days[`2026-10-${d}`] = { shiftId: s }
 days['2026-10-16'] = { shiftId: 'm', end: 900, note: 'Inventaire' };
 days['2026-10-24'] = { start: 540, end: 720, pause: 0, rate: 12.5, note: 'Formation' };
 
-export function demoState(overrides = {}) {
+export function demoState(overrides = {}, rulesOverrides = {}) {
   return JSON.stringify({
     state: {
       shifts,
@@ -65,6 +65,7 @@ export function demoState(overrides = {}) {
         alsaceMoselle: false,
         extraHolidays: [],
         stacking: 'max',
+        ...rulesOverrides,
       },
       onboarded: true,
     },

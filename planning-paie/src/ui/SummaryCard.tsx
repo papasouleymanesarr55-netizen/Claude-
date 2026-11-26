@@ -32,17 +32,7 @@ export function SummaryCard({ gross, net, hours, daysWorked, premium, charges, o
       })}. ${hoursText}. ${t.summary.indicative}`}
     >
       <View style={styles.top}>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.caption, { color: theme.onAccent }]}>{t.summary.gross}</Text>
-          <Text
-            testID="summary-gross"
-            style={[styles.gross, { color: theme.onAccent }]}
-            adjustsFontSizeToFit
-            numberOfLines={1}
-          >
-            {formatMoney(gross, lang)}
-          </Text>
-        </View>
+        <Text style={[styles.caption, { color: theme.onAccent }]}>{t.summary.gross}</Text>
         <Pressable
           testID="charges-button"
           onPress={onCharges}
@@ -55,6 +45,14 @@ export function SummaryCard({ gross, net, hours, daysWorked, premium, charges, o
           </Text>
         </Pressable>
       </View>
+      <Text
+        testID="summary-gross"
+        style={[styles.gross, { color: theme.onAccent }]}
+        adjustsFontSizeToFit
+        numberOfLines={1}
+      >
+        {formatMoney(gross, lang)}
+      </Text>
       <Text testID="summary-net" style={[styles.net, { color: theme.onAccent }]}>
         {fill(t.summary.net, { amount: formatMoney(net, lang) })}
       </Text>
@@ -71,8 +69,8 @@ export function SummaryCard({ gross, net, hours, daysWorked, premium, charges, o
 
 const styles = StyleSheet.create({
   card: { borderRadius: 18, padding: 16, marginBottom: 10 },
-  top: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  caption: { fontSize: 14, fontWeight: '600', opacity: 0.95 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  caption: { flex: 1, fontSize: 14, fontWeight: '600', opacity: 0.95 },
   gross: { fontSize: 36, fontWeight: '800', marginTop: 2 },
   net: { fontSize: 17, fontWeight: '700', marginTop: 4 },
   meta: { fontSize: 14, marginTop: 4, opacity: 0.95 },

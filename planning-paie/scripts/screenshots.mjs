@@ -9,8 +9,17 @@ import { demoState } from './demo-data.mjs';
 // Playwright est installé globalement dans l'environnement de capture.
 const { chromium } = createRequire(import.meta.url)('playwright');
 
+// MODE=ios : 1290 × 2796 (iPhone 6,7 pouces) ; MODE=android : 1080 × 2400 ; sinon aperçu.
+const MODE = process.env.MODE ?? 'preview';
+const VIEW = {
+  ios: { width: 430, height: 932, scale: 3 },
+  android: { width: 360, height: 800, scale: 3 },
+  preview: { width: 430, height: 932, scale: Number(process.env.SCALE ?? 1) },
+}[MODE];
 const dist = resolve(process.argv[2] ?? 'dist');
-const out = resolve(process.argv[3] ?? 'scripts/out');
+const out = resolve(
+  process.argv[3] ?? (MODE === 'preview' ? 'scripts/out' : `store/screenshots/${MODE}`),
+);
 const types = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -40,10 +49,13 @@ await mkdir(out, { recursive: true });
 const browser = await chromium.launch();
 const errors = [];
 
-async function shot(name, { theme = 'light', premium = false, path = '/', act, state } = {}) {
+async function shot(
+  name,
+  { theme = 'light', premium = false, path = '/', act, state, rules } = {},
+) {
   const ctx = await browser.newContext({
-    viewport: { width: 430, height: 932 },
-    deviceScaleFactor: Number(process.env.SCALE ?? 1),
+    viewport: { width: VIEW.width, height: VIEW.height },
+    deviceScaleFactor: VIEW.scale,
     locale: 'fr-FR',
     timezoneId: 'Europe/Paris',
     colorScheme: theme,
@@ -52,7 +64,7 @@ async function shot(name, { theme = 'light', premium = false, path = '/', act, s
   page.on('pageerror', (e) => errors.push(`${name}: ${e.message}`));
   page.on('console', (m) => m.type() === 'error' && errors.push(`${name}: ${m.text()}`));
   await page.clock.setFixedTime(new Date('2026-10-16T09:00:00+02:00'));
-  const value = state === undefined ? demoState({ theme, premium }) : state;
+  const value = state === undefined ? demoState({ theme, premium }, rules) : state;
   await page.addInitScript((v) => {
     if (v !== null) localStorage.setItem('planning-paie', v);
   }, value);
@@ -62,6 +74,31 @@ async function shot(name, { theme = 'light', premium = false, path = '/', act, s
   await page.waitForTimeout(500);
   await page.screenshot({ path: join(out, `${name}.png`) });
   await ctx.close();
+}
+
+const openDay = async (p) => {
+  await p.getByTestId('day-2026-10-16').click();
+  await p.getByTestId('day-2026-10-16').click();
+};
+const editShift = async (p) => {
+  await p.getByTestId('edit-toggle').click();
+  await p.getByTestId('chip-Matin').click();
+};
+
+if (MODE !== 'preview') {
+  await shot('1-planning-du-mois');
+  await shot('2-modifier-un-jour', { act: openDay });
+  await shot('3-poste-et-taux-horaire', { act: editShift });
+  await shot('4-heures-sup-majorations', {
+    premium: true,
+    rules: { enabled: true, night: { rate: 20, start: 1260, end: 360 }, sundayRate: 0 },
+  });
+  await shot('5-theme-sombre', { theme: 'dark' });
+  await shot('6-sauvegarde-et-reglages', { path: '/settings', premium: true });
+  await browser.close();
+  server.close();
+  console.log('Captures enregistrées dans', out);
+  process.exit(errors.length ? 1 : 0);
 }
 
 await shot('01-mois');
