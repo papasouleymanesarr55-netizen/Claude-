@@ -197,6 +197,13 @@ export default function SettingsScreen() {
       <SectionTitle>{t.settings.data}</SectionTitle>
       <Card>
         <Row
+          testID="open-recap-settings"
+          label={t.recap.title}
+          detail={t.recap.intro}
+          onPress={() => router.push('/recap')}
+        />
+        <Divider />
+        <Row
           testID="export-json"
           label={t.settings.export}
           onPress={() => void run(() => exportJson(), t.settings.exportError)}

@@ -42,6 +42,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: t.settings.title }} />
+        <Stack.Screen name="recap" options={{ title: t.recap.title }} />
         <Stack.Screen name="rules" options={{ title: t.rules.title }} />
         <Stack.Screen name="premium" options={{ title: t.common.premium, presentation: 'modal' }} />
         <Stack.Screen name="legal" options={{ title: '' }} />

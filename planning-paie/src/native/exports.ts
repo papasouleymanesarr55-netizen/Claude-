@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { exportBackup } from '../domain/backup';
 import { computeMonth, netFrom, resolveDay } from '../domain/calc';
 import { formatHours, formatMoney, formatNumber } from '../domain/format';
+import { recapByEmployer } from '../domain/recap';
 import { parseDayKey, toHHMM } from '../domain/time';
 import { currentI18n, fill } from '../i18n';
 import { selectPremium, useAppStore } from '../store/store';
@@ -148,6 +149,166 @@ export async function exportCsv(year: number, month0: number): Promise<void> {
   await shareTextFile(
     name,
     timesheetCsv(year, month0),
+    'text/csv',
+    'public.comma-separated-values-text',
+  );
+}
+
+/** Récapitulatif du mois par entreprise, à partir de l'état courant. */
+export function monthRecap(year: number, month0: number) {
+  const s = useAppStore.getState();
+  const { t, locale } = currentI18n();
+  const summary = computeMonth(
+    { shifts: s.shifts, days: s.days, rules: s.rules, advanced: selectPremium(s) },
+    year,
+    month0,
+  );
+  const recap = recapByEmployer(summary, s.shifts, s.days, s.settings.charges, t.day.customShift);
+  const monthLabel = format(new Date(year, month0, 1), 'LLLL yyyy', { locale });
+  return {
+    recap,
+    charges: s.settings.charges,
+    monthLabel: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
+  };
+}
+
+export function recapHtml(year: number, month0: number): string {
+  const { t, lang, locale } = currentI18n();
+  const { recap, charges, monthLabel } = monthRecap(year, month0);
+  const title = fill(t.recap.pdfTitle, { month: monthLabel });
+  const money = (n: number) => esc(formatMoney(n, lang));
+  const hours = (n: number) => esc(formatHours(n, lang));
+  const name = (e: string) => esc(e || t.recap.noEmployer);
+
+  const overview = recap.employers
+    .map(
+      (e) =>
+        `<tr><td>${name(e.employer)}</td><td class="n">${e.daysWorked}</td><td class="n">${hours(e.hours)}</td><td class="n">${money(e.gross)}</td><td class="n">${money(e.net)}</td></tr>`,
+    )
+    .join('');
+
+  const sections = recap.employers
+    .map((e) => {
+      const rows = e.days
+        .map(
+          (d) =>
+            `<tr><td>${esc(format(parseDayKey(d.day.key), 'EEE d MMM', { locale }))}</td><td>${esc(d.day.shift?.name ?? t.day.customShift)}</td><td>${toHHMM(d.day.start)}–${toHHMM(d.day.end)}${d.day.pause ? ` (−${d.day.pause} min)` : ''}</td><td class="n">${hours(d.hours)}</td><td class="n">${money(d.gross)}</td><td>${esc(d.day.note ?? '')}</td></tr>`,
+        )
+        .join('');
+      const lines = e.lines
+        .map(
+          (l) =>
+            `${esc(fill(t.recap.shiftLine, { name: l.label, count: l.count }))} : ${hours(l.hours)} · ${money(l.gross)}`,
+        )
+        .join(' &nbsp;|&nbsp; ');
+      return `<h2>${name(e.employer)}</h2>
+<p class="muted">${lines}</p>
+<table><thead><tr><th>${t.pdf.date}</th><th>${t.pdf.shift}</th><th>${t.pdf.hours}</th><th class="n">${t.pdf.duration}</th><th class="n">${t.pdf.gross}</th><th>${t.pdf.note}</th></tr></thead>
+<tbody>${rows}</tbody>
+<tfoot><tr><td colspan="3">${esc(fill(t.recap.subtotal, { name: e.employer || t.recap.noEmployer }))}</td><td class="n">${hours(e.hours)}</td><td class="n">${money(e.gross)}</td><td></td></tr>
+${e.premium > 0 ? `<tr><td colspan="4">${t.pdf.premium}</td><td class="n">${money(e.premium)}</td><td></td></tr>` : ''}
+<tr><td colspan="4">${esc(fill(t.pdf.net, { percent: formatNumber(charges, lang, 1) }))}</td><td class="n">${money(e.net)}</td><td></td></tr></tfoot></table>`;
+    })
+    .join('');
+
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${esc(title)}</title>
+<style>
+body{font-family:-apple-system,Roboto,Helvetica,Arial,sans-serif;color:#16181d;margin:32px;font-size:12px}
+h1{font-size:20px;margin:0 0 16px}h2{font-size:16px;margin:28px 0 4px;page-break-after:avoid}
+table{width:100%;border-collapse:collapse;page-break-inside:auto}
+th,td{border-bottom:1px solid #d5d8e0;padding:6px 4px;text-align:left}
+th{background:#eceef3}.n{text-align:right;white-space:nowrap}
+tfoot td{font-weight:700}.grand td{font-weight:800;border-top:2px solid #16181d;font-size:13px}
+.muted{color:#555b66;margin:0 0 8px}.small{color:#555b66;font-size:10px;margin-top:24px}
+</style></head><body>
+<h1>${esc(title)}</h1>
+<table><thead><tr><th>${t.recap.employer}</th><th class="n">${t.recap.days}</th><th class="n">${t.recap.hours}</th><th class="n">${t.recap.gross}</th><th class="n">${t.recap.net}</th></tr></thead>
+<tbody>${overview}</tbody>
+<tfoot><tr class="grand"><td>${t.recap.total}</td><td class="n">${recap.total.daysWorked}</td><td class="n">${hours(recap.total.hours)}</td><td class="n">${money(recap.total.gross)}</td><td class="n">${money(recap.total.net)}</td></tr></tfoot></table>
+${sections}
+<p class="small">${esc(fill(t.pdf.net, { percent: formatNumber(charges, lang, 1) }))}. ${t.pdf.footer}</p>
+</body></html>`;
+}
+
+/** CSV du récapitulatif : une ligne par jour avec l'entreprise, sous-totaux puis total. */
+export function recapCsv(year: number, month0: number): string {
+  const { t, lang, locale } = currentI18n();
+  const { recap } = monthRecap(year, month0);
+  const q = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  const num = (n: number) => formatNumber(n, lang, 2).replace(/\s/g, '');
+  const sep = lang === 'fr' ? ';' : ',';
+  const row = (cells: string[]) => cells.map(q).join(sep);
+  const lines = [
+    row([
+      t.recap.employer,
+      t.pdf.date,
+      t.pdf.shift,
+      t.pdf.hours,
+      t.pdf.duration,
+      t.pdf.gross,
+      t.recap.net,
+      t.pdf.note,
+    ]),
+  ];
+  for (const e of recap.employers) {
+    const emp = e.employer || t.recap.noEmployer;
+    for (const d of e.days) {
+      lines.push(
+        row([
+          emp,
+          format(parseDayKey(d.day.key), 'dd/MM/yyyy', { locale }),
+          d.day.shift?.name ?? t.day.customShift,
+          `${toHHMM(d.day.start)}-${toHHMM(d.day.end)}`,
+          num(d.hours),
+          num(d.gross),
+          '',
+          d.day.note ?? '',
+        ]),
+      );
+    }
+    lines.push(
+      row([
+        fill(t.recap.subtotal, { name: emp }),
+        '',
+        '',
+        '',
+        num(e.hours),
+        num(e.gross),
+        num(e.net),
+        '',
+      ]),
+    );
+  }
+  lines.push(
+    row([
+      t.recap.total,
+      '',
+      '',
+      '',
+      num(recap.total.hours),
+      num(recap.total.gross),
+      num(recap.total.net),
+      '',
+    ]),
+  );
+  return `﻿${lines.join('\r\n')}\r\n`;
+}
+
+export async function exportRecapPdf(year: number, month0: number): Promise<void> {
+  const html = recapHtml(year, month0);
+  if (Platform.OS === 'web') {
+    await Print.printAsync({ html });
+    return;
+  }
+  const { uri } = await Print.printToFileAsync({ html });
+  await shareFileUri(uri, 'application/pdf', 'com.adobe.pdf');
+}
+
+export async function exportRecapCsv(year: number, month0: number): Promise<void> {
+  const name = `recap-${year}-${String(month0 + 1).padStart(2, '0')}.csv`;
+  await shareTextFile(
+    name,
+    recapCsv(year, month0),
     'text/csv',
     'public.comma-separated-values-text',
   );

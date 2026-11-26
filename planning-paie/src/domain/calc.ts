@@ -44,8 +44,20 @@ export function resolveDay(
     (entry.start !== undefined && entry.start !== shift.start) ||
     (entry.end !== undefined && entry.end !== shift.end) ||
     (entry.pause !== undefined && entry.pause !== shift.pause) ||
-    (entry.rate !== undefined && entry.rate !== shift.rate);
-  return { key, shift, start, end, pause, rate, note: entry.note || undefined, customized };
+    (entry.rate !== undefined && entry.rate !== shift.rate) ||
+    (entry.employer !== undefined && entry.employer !== (shift.employer ?? ''));
+  const employer = (entry.employer ?? shift?.employer)?.trim() || undefined;
+  return {
+    key,
+    shift,
+    start,
+    end,
+    pause,
+    rate,
+    note: entry.note || undefined,
+    employer,
+    customized,
+  };
 }
 
 /**
@@ -53,7 +65,14 @@ export function resolveDay(
  */
 export function buildDayEntry(
   shift: Shift | undefined,
-  values: { start: Minutes; end: Minutes; pause: number; rate: number; note?: string },
+  values: {
+    start: Minutes;
+    end: Minutes;
+    pause: number;
+    rate: number;
+    note?: string;
+    employer?: string;
+  },
 ): DayEntry {
   const entry: DayEntry = {};
   if (shift) {
@@ -68,6 +87,8 @@ export function buildDayEntry(
     entry.pause = values.pause;
     entry.rate = values.rate;
   }
+  const employer = values.employer?.trim().slice(0, 40) ?? '';
+  if (employer !== (shift?.employer ?? '')) entry.employer = employer;
   const note = values.note?.trim();
   if (note) entry.note = note.slice(0, 60);
   return entry;
@@ -250,13 +271,16 @@ export function computePeriod(input: CalcInput, from: DayKey, to: DayKey): Perio
   } else {
     const weekFrom = isoWeekStart(from);
     const weekTo = addDays(isoWeekStart(to), 6);
-    let weekMinutes = 0;
+    // Les heures supplémentaires se comptent par employeur (un contrat = un seuil hebdomadaire).
+    let weekMinutes = new Map<string, number>();
     for (const key of keysBetween(weekFrom, weekTo)) {
-      if (key === isoWeekStart(key)) weekMinutes = 0;
+      if (key === isoWeekStart(key)) weekMinutes = new Map();
       const day = resolveDay(key, input.days[key], shiftsById);
       if (!day) continue;
-      const pay = advancedDay(day, input.rules, weekMinutes);
-      weekMinutes += workedMinutes(day.start, day.end, day.pause);
+      const emp = day.employer ?? '';
+      const before = weekMinutes.get(emp) ?? 0;
+      const pay = advancedDay(day, input.rules, before);
+      weekMinutes.set(emp, before + workedMinutes(day.start, day.end, day.pause));
       if (key >= from && key <= to) pays.push(pay);
     }
   }

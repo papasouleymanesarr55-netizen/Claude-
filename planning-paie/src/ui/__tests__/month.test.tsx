@@ -109,3 +109,16 @@ describe('écran du mois', () => {
     expect(label).toMatch(/poste Matin, 7 h 30, 93,75 euros/);
   });
 });
+
+describe('entreprise', () => {
+  it("enregistre l'entreprise d'un poste et la propose ensuite", async () => {
+    await render(<MonthScreen />);
+    await fireEvent.press(screen.getByTestId('chip-add'));
+    await fireEvent.changeText(screen.getByTestId('shift-name'), 'Matin A');
+    await fireEvent.changeText(screen.getByTestId('shift-employer'), '  Alpha  ');
+    await fireEvent.press(screen.getByTestId('shift-save'));
+    expect(useAppStore.getState().shifts.find((s) => s.name === 'Matin A')?.employer).toBe('Alpha');
+    await fireEvent.press(screen.getByTestId('chip-add'));
+    expect(screen.getByLabelText('Entreprise / mission (facultatif) : Alpha')).toBeTruthy();
+  });
+});

@@ -109,6 +109,21 @@ export default function MonthScreen() {
           <Text style={[styles.arrow, { color: theme.accent }]}>›</Text>
         </Pressable>
         <Pressable
+          testID="open-recap"
+          onPress={() =>
+            router.push({
+              pathname: '/recap',
+              params: { y: String(cursor.year), m: String(cursor.month0) },
+            })
+          }
+          accessibilityRole="button"
+          accessibilityLabel={t.month.recapA11y}
+          hitSlop={8}
+          style={[styles.recapBtn, { borderColor: theme.accent }]}
+        >
+          <Text style={[styles.recapText, { color: theme.accent }]}>{t.month.recap}</Text>
+        </Pressable>
+        <Pressable
           testID="open-settings"
           onPress={() => router.push('/settings')}
           accessibilityRole="button"
@@ -173,5 +188,14 @@ const styles = StyleSheet.create({
   },
   arrow: { fontSize: 34, fontWeight: '600', lineHeight: 38 },
   gear: { fontSize: 24 },
+  recapBtn: {
+    minHeight: 36,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+    marginLeft: 2,
+  },
+  recapText: { fontSize: 14, fontWeight: '700' },
   content: { padding: 10, paddingBottom: 16, maxWidth: 720, width: '100%', alignSelf: 'center' },
 });

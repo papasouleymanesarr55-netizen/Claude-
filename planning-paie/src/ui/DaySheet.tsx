@@ -8,6 +8,7 @@ import { normalizeTimeInput, parseDayKey, toHHMM } from '../domain/time';
 import type { DayKey } from '../domain/types';
 import { fill, useI18n } from '../i18n';
 import { useAppStore } from '../store/store';
+import { EmployerField } from './EmployerField';
 import { Button, Field, FieldRow } from './kit';
 import { Sheet } from './Sheet';
 import { ShiftChip } from './ShiftChip';
@@ -21,6 +22,7 @@ interface Form {
   pause: string;
   rate: string;
   note: string;
+  employer: string;
 }
 
 export function capitalize(s: string): string {
@@ -46,6 +48,7 @@ function initialForm(dayKey: DayKey, lang: 'fr' | 'en'): Form {
       pause: String(day.pause),
       rate: formatNumber(day.rate, lang),
       note: day.note ?? '',
+      employer: day.employer ?? '',
     };
   }
   const first = state.shifts[0];
@@ -56,6 +59,7 @@ function initialForm(dayKey: DayKey, lang: 'fr' | 'en'): Form {
     pause: first ? String(first.pause) : '0',
     rate: formatNumber(rate, lang),
     note: '',
+    employer: first?.employer ?? '',
   };
 }
 
@@ -75,7 +79,14 @@ function DayForm({ dayKey, onClose }: { dayKey: DayKey; onClose: () => void }) {
     const rate = parseDecimal(form.rate);
     if (start === null || end === null || pause === null || rate === null || pause > 1439)
       return null;
-    return { start, end, pause: Math.round(pause), rate, note: form.note };
+    return {
+      start,
+      end,
+      pause: Math.round(pause),
+      rate,
+      note: form.note,
+      employer: form.employer,
+    };
   }, [form]);
 
   const set = (patch: Partial<Form>) => setForm({ ...form, ...patch });
@@ -92,6 +103,7 @@ function DayForm({ dayKey, onClose }: { dayKey: DayKey; onClose: () => void }) {
       end: toHHMM(s.end),
       pause: String(s.pause),
       rate: formatNumber(s.rate, lang),
+      employer: s.employer ?? '',
     });
   };
 
@@ -199,6 +211,11 @@ function DayForm({ dayKey, onClose }: { dayKey: DayKey; onClose: () => void }) {
           error={parseDecimal(form.rate) === null}
         />
       </FieldRow>
+      <EmployerField
+        testID="day-employer"
+        value={form.employer}
+        onChange={(employer) => set({ employer })}
+      />
       <Field
         testID="day-note"
         label={t.day.note}

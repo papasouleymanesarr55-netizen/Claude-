@@ -47,6 +47,21 @@ Chaque choix ci-dessous a été fait sans vous demander, selon les défauts du b
     dépendance supplémentaire. Un vrai fichier .xlsx pourra venir en v1.1.
 19. **Icône** : calendrier blanc et pièce « € » jaune sur fond bleu (#2348C4), générée par script.
 
+## Récap par entreprise (ajouté à votre demande)
+
+26. **Entreprise / mission** : champ facultatif sur chaque poste (ex. « Matin » chez Boulangerie Martin).
+    Un jour peut changer d'entreprise depuis sa fiche (seul l'écart est enregistré). Les noms déjà
+    utilisés sont proposés en un toucher. Les jours sans entreprise sont regroupés dans
+    « Sans entreprise ».
+27. **Écran « Récap »** (bouton en haut de l'écran du mois, et Réglages > Mes données) : pour chaque
+    entreprise, heures, jours, brut, net estimé, détail par poste et liste des jours ; puis le total
+    général. **Consultation gratuite ; export PDF et Excel du récap en Premium**, comme les autres
+    exports. Facile à rendre gratuit si vous préférez.
+28. **Heures supplémentaires par employeur** : avec le calcul avancé, le seuil de 35 h s'applique
+    séparément à chaque entreprise (un contrat = un seuil), et non au cumul de toutes.
+29. **Taux** : chaque entreprise garde le taux horaire de ses postes ; pas de taux « par entreprise »
+    distinct, pour ne pas avoir deux endroits où saisir le même chiffre.
+
 ## Publication et monétisation
 
 20. **Identifiant** : `fr.planningpaie.app` (iOS et Android). À changer **avant la première mise en ligne**

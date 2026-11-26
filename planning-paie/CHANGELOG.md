@@ -11,4 +11,6 @@
 - Thème clair/sombre, français et anglais, accessibilité (lecteur d'écran, grandes polices).
 - Premium : heures supplémentaires par semaine, majorations nuit/dimanche/fériés, jours fériés
   français, synchronisation calendrier, rappels, feuille d'heures PDF et tableau CSV.
+- Récap du mois par entreprise / mission : heures, jours, brut et net de chaque entreprise,
+  puis total général ; export PDF et Excel (Premium).
 - Aucune publicité, aucun compte, aucun suivi.

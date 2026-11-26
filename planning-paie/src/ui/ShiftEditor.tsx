@@ -8,6 +8,7 @@ import { SHIFT_COLORS, type Shift } from '../domain/types';
 import { fill, useI18n } from '../i18n';
 import { useAppStore } from '../store/store';
 import { ColorPicker } from './ColorPicker';
+import { EmployerField } from './EmployerField';
 import { confirmAsync } from './dialogs';
 import { Button, Field, FieldRow } from './kit';
 import { Sheet } from './Sheet';
@@ -27,6 +28,7 @@ interface Form {
   pause: string;
   rate: string;
   color: string;
+  employer: string;
 }
 
 export function parseShiftForm(f: Form): Omit<Shift, 'id'> | null {
@@ -37,7 +39,16 @@ export function parseShiftForm(f: Form): Omit<Shift, 'id'> | null {
   const rate = parseDecimal(f.rate);
   if (!name || start === null || end === null || pause === null || rate === null) return null;
   if (pause > 1439 || rate > 10000) return null;
-  return { name, start, end, pause: Math.round(pause), rate, color: f.color };
+  const employer = f.employer.trim().slice(0, 40);
+  return {
+    name,
+    start,
+    end,
+    pause: Math.round(pause),
+    rate,
+    color: f.color,
+    ...(employer ? { employer } : { employer: undefined }),
+  };
 }
 
 export function ShiftEditor({ target, onClose }: Props) {
@@ -57,6 +68,7 @@ function initialForm(target: Shift | 'new', lang: 'fr' | 'en'): Form {
       pause: '30',
       rate: formatNumber(settings.lastRate, lang),
       color: SHIFT_COLORS[shifts.length % SHIFT_COLORS.length]!,
+      employer: '',
     };
   }
   return {
@@ -66,6 +78,7 @@ function initialForm(target: Shift | 'new', lang: 'fr' | 'en'): Form {
     pause: String(target.pause),
     rate: formatNumber(target.rate, lang),
     color: target.color,
+    employer: target.employer ?? '',
   };
 }
 
@@ -145,6 +158,11 @@ function ShiftEditorForm({ target, onClose }: { target: Shift | 'new'; onClose: 
         error={showError && !form.name.trim()}
         autoFocus={target === 'new'}
         returnKeyType="next"
+      />
+      <EmployerField
+        testID="shift-employer"
+        value={form.employer}
+        onChange={(employer) => set({ employer })}
       />
       <FieldRow>
         <TimeField

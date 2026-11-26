@@ -15,10 +15,19 @@ export interface BackupFile {
     pause: number;
     rate: number;
     color: string;
+    employer?: string;
   }[];
   days: Record<
     DayKey,
-    { s?: string; start?: string; end?: string; pause?: number; rate?: number; note?: string }
+    {
+      s?: string;
+      start?: string;
+      end?: string;
+      pause?: number;
+      rate?: number;
+      note?: string;
+      employer?: string;
+    }
   >;
   net: number;
   rate: number;
@@ -47,6 +56,7 @@ export function exportBackup(
     if (e.pause !== undefined) out.pause = e.pause;
     if (e.rate !== undefined) out.rate = e.rate;
     if (e.note) out.note = e.note;
+    if (e.employer !== undefined) out.employer = e.employer;
     days[key] = out;
   }
   return {
@@ -61,6 +71,7 @@ export function exportBackup(
       pause: s.pause,
       rate: s.rate,
       color: s.color,
+      ...(s.employer ? { employer: s.employer } : {}),
     })),
     days,
     net: data.charges,
@@ -161,6 +172,9 @@ export function parseBackup(text: string): ImportResult {
         typeof s.color === 'string' && HEX.test(s.color)
           ? s.color
           : SHIFT_COLORS[i % SHIFT_COLORS.length]!,
+      ...(typeof s.employer === 'string' && s.employer.trim()
+        ? { employer: s.employer.trim().slice(0, 40) }
+        : {}),
     });
   }
 
@@ -183,6 +197,7 @@ export function parseBackup(text: string): ImportResult {
     if (pause !== undefined) entry.pause = pause;
     if (rate !== undefined) entry.rate = rate;
     if (typeof v.note === 'string' && v.note.trim()) entry.note = v.note.trim().slice(0, 60);
+    if (typeof v.employer === 'string') entry.employer = v.employer.trim().slice(0, 40);
     const usable =
       entry.shiftId !== undefined || (entry.start !== undefined && entry.end !== undefined);
     if (!usable) {

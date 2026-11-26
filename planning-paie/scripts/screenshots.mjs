@@ -94,7 +94,7 @@ if (MODE !== 'preview') {
     rules: { enabled: true, night: { rate: 20, start: 1260, end: 360 }, sundayRate: 0 },
   });
   await shot('5-theme-sombre', { theme: 'dark' });
-  await shot('6-sauvegarde-et-reglages', { path: '/settings', premium: true });
+  await shot('6-recap-par-entreprise', { path: '/recap?y=2026&m=9', premium: true });
   await browser.close();
   server.close();
   console.log('Captures enregistrées dans', out);
@@ -119,6 +119,8 @@ await shot('05-reglages', { path: '/settings', premium: true });
 await shot('06-premium', { path: '/premium' });
 await shot('07-calcul-avance', { path: '/rules', premium: true });
 await shot('08-bienvenue', { state: null });
+await shot('09-recap', { path: '/recap?y=2026&m=9' });
+await shot('10-recap-sombre', { path: '/recap?y=2026&m=9', theme: 'dark', premium: true });
 
 await browser.close();
 server.close();

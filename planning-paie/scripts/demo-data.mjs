@@ -1,8 +1,35 @@
 // Données de démonstration (octobre 2026) pour les captures d'écran.
 const shifts = [
-  { id: 'm', name: 'Matin', start: 360, end: 840, pause: 30, rate: 12.5, color: '#d99a00' },
-  { id: 's', name: 'Soir', start: 840, end: 1320, pause: 30, rate: 12.5, color: '#2f7de1' },
-  { id: 'n', name: 'Nuit', start: 1320, end: 360, pause: 30, rate: 13.4, color: '#8b5cf6' },
+  {
+    id: 'm',
+    name: 'Matin',
+    start: 360,
+    end: 840,
+    pause: 30,
+    rate: 12.5,
+    color: '#d99a00',
+    employer: 'Boulangerie Martin',
+  },
+  {
+    id: 's',
+    name: 'Soir',
+    start: 840,
+    end: 1320,
+    pause: 30,
+    rate: 12.5,
+    color: '#2f7de1',
+    employer: 'Hôtel du Parc',
+  },
+  {
+    id: 'n',
+    name: 'Nuit',
+    start: 1320,
+    end: 360,
+    pause: 30,
+    rate: 13.4,
+    color: '#8b5cf6',
+    employer: 'Clinique Saint-Jean',
+  },
 ];
 const plan = {
   '01': 'm',

@@ -14,6 +14,8 @@ export interface Shift {
   /** Taux horaire brut en euros. */
   rate: number;
   color: string;
+  /** Entreprise, client ou mission (facultatif), utilisé pour le récapitulatif. */
+  employer?: string;
 }
 
 /** Saisie d'un jour : les champs absents héritent du poste. */
@@ -24,6 +26,8 @@ export interface DayEntry {
   pause?: number;
   rate?: number;
   note?: string;
+  /** Entreprise de ce jour, si elle diffère de celle du poste. */
+  employer?: string;
 }
 
 /** Valeurs effectives d'un jour, après héritage du poste. */
@@ -35,6 +39,8 @@ export interface ResolvedDay {
   pause: number;
   rate: number;
   note?: string;
+  /** Entreprise effective (jour, sinon poste). */
+  employer?: string;
   /** Vrai si au moins une valeur diffère du poste (ou jour sans poste). */
   customized: boolean;
 }
