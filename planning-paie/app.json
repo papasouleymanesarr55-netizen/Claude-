@@ -73,7 +73,7 @@
         "expo-calendar",
         {
           "calendarPermission": "Planning Paie copie vos postes dans un calendrier « Planning Paie » de votre téléphone, pour les voir avec vos autres rendez-vous.",
-          "remindersPermission": "Planning Paie n'utilise pas vos rappels."
+          "remindersPermission": "Planning Paie ne lit pas vos rappels : cette autorisation n'est jamais demandée par l'application."
         }
       ],
       [

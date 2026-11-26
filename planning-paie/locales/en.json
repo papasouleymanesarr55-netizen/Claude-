@@ -2,6 +2,6 @@
   "CFBundleDisplayName": "Planning Paie",
   "NSCalendarsFullAccessUsageDescription": "Planning Paie copies your shifts into a “Planning Paie” calendar on your phone so you can see them with your other events.",
   "NSCalendarsUsageDescription": "Planning Paie copies your shifts into a “Planning Paie” calendar on your phone so you can see them with your other events.",
-  "NSRemindersFullAccessUsageDescription": "Planning Paie does not use your reminders.",
-  "NSRemindersUsageDescription": "Planning Paie does not use your reminders."
+  "NSRemindersFullAccessUsageDescription": "Planning Paie does not read your reminders: the app never asks for this permission.",
+  "NSRemindersUsageDescription": "Planning Paie does not read your reminders: the app never asks for this permission."
 }
